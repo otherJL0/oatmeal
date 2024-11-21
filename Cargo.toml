@@ -13,7 +13,7 @@ exclude = [
   ".rustfmt.toml",
   "cliff.toml",
   "committed.toml",
-  "deny.toml"
+  "deny.toml",
 ]
 keywords = ["cli", "llm", "chat", "tui"]
 license = "MIT"
@@ -30,84 +30,107 @@ dhat-heap = ["dep:dhat"]
 members = ["tools/xtask"]
 
 [dependencies]
-anyhow = { version = "=1.0.75", features = ["backtrace"] }
-arboard = { version = "=3.2.1", default-features = false, features = ["wayland-data-control"] }
-async-trait = "=0.1.74"
-base64 = "=0.21.5"
+anyhow = { version = "=1.0.93", features = ["backtrace"] }
+arboard = { version = "=3.4.1", default-features = false, features = [
+  "wayland-data-control",
+] }
+async-trait = "=0.1.83"
+base64 = "=0.22.1"
 better-panic = "=0.3.0"
 bincode = "=1.3.3"
-chrono = { version = "=0.4.31", default-features = false, features = ["clock"] }
-clap = { version = "=4.4.7", features = ["env", "string"] }
-clap_complete = "=4.4.4"
-clap_mangen = { version = "=0.2.15" }
-crossterm = { version = "=0.27.0", features = ["bracketed-paste", "event-stream"] }
-dashmap = "=5.5.3"
-dhat = { version = "=0.3.2", optional = true }
-dialoguer = { version = "=0.10.4", default-features = false, features = ["editor"] }
-dirs = "=5.0.0"
-dirs-sys = "=0.4.0" # Pinned sub dependency to avoid poor choices in later versions.
-futures = "=0.3.28"
-itertools = "=0.11.0"
-once_cell = "=1.18.0"
-ratatui = "=0.24.0"
-regex = "=1.10.3"
-reqwest = { version = "=0.11.22", default-features = false, features = [
+chrono = { version = "=0.4.38", default-features = false, features = ["clock"] }
+clap = { version = "=4.5.21", features = ["env", "string"] }
+clap_complete = "=4.5.38"
+clap_mangen = { version = "=0.2.24" }
+crossterm = { version = "=0.28.1", features = [
+  "bracketed-paste",
+  "event-stream",
+] }
+dashmap = "=6.1.0"
+dhat = { version = "=0.3.3", optional = true }
+dialoguer = { version = "=0.11.0", default-features = false, features = [
+  "editor",
+] }
+dirs = "=5.0.1"
+dirs-sys = "=0.4.1" # Pinned sub dependency to avoid poor choices in later versions.
+futures = "=0.3.31"
+itertools = "=0.13.0"
+once_cell = "=1.20.2"
+ratatui = "=0.29.0"
+regex = "=1.11.1"
+reqwest = { version = "=0.12.9", default-features = false, features = [
   "stream",
   "json",
   "gzip",
-  "rustls-tls-native-roots"
+  "rustls-tls-native-roots",
 ] }
-serde = { version = "=1.0.193", features = ["derive"] }
-serde_json = "=1.0.107"
-serde_yaml = "=0.9.27"
-strum = { version = "=0.25.0", features = ["derive"] }
-syntect = { version = "=5.1.0", default-features = false, features = [
+serde = { version = "=1.0.215", features = ["derive"] }
+serde_json = "=1.0.133"
+serde_yaml = "=0.9.34"
+strum = { version = "=0.26.3", features = ["derive"] }
+syntect = { version = "=5.2.0", default-features = false, features = [
   "parsing",
   "plist-load",
-  "regex-onig"
+  "regex-onig",
 ] }
-tokio = { version = "=1.33.0", features = ["fs", "macros", "rt-multi-thread", "sync", "process"] }
-tokio-util = "=0.7.9"
-toml_edit = "=0.21.0"
-tracing = { version = "=0.1.40", default-features = false, features = ["std", "log"] }
+tokio = { version = "=1.41.1", features = [
+  "fs",
+  "macros",
+  "rt-multi-thread",
+  "sync",
+  "process",
+] }
+tokio-util = "=0.7.12"
+toml_edit = "=0.22.22"
+tracing = { version = "=0.1.40", default-features = false, features = [
+  "std",
+  "log",
+] }
 tracing-appender = "=0.2.3"
-tracing-subscriber = { version = "=0.3.18", default-features = false, features = ["json"] }
-tui-textarea = { version = "=0.4.0", default-features = false, features = ["crossterm", "ratatui"] }
-uuid = { version = "=1.6.1", features = ["v4"] }
-yansi = "=0.5.1"
+tracing-subscriber = { version = "=0.3.18", default-features = false, features = [
+  "json",
+] }
+tui-textarea = { version = "=0.7.0", default-features = false, features = [
+  "crossterm",
+  "ratatui",
+] }
+uuid = { version = "=1.11.0", features = ["v4"] }
+yansi = "=1.0.1"
 
 # Fix for cargo-about
 [target.'cfg(target_os="macos")'.dependencies]
-errno = "=0.3.5"
+errno = "=0.3.9"
 
 [dev-dependencies]
-cargo-husky = { version = "=1.5.0", default-features = false, features = ["user-hooks"] }
-insta = { version = "=1.34.0", features = ["toml", "yaml"] }
-mockito = "=1.2.0"
-tempfile = "=3.8.1"
+cargo-husky = { version = "=1.5.0", default-features = false, features = [
+  "user-hooks",
+] }
+insta = { version = "=1.41.1", features = ["toml", "yaml"] }
+mockito = "=1.6.1"
+tempfile = "=3.14.0"
 test_utils = { path = "./test/utils" }
 
 [build-dependencies]
-anyhow = "=1.0.75"
+anyhow = "=1.0.93"
 bincode = "=1.3.3"
-flate2 = "=1.0.28"
+flate2 = "=1.0.35"
 glob-match = "=0.2.1"
-reqwest = { version = "=0.11.22", default-features = false, features = [
+reqwest = { version = "=0.12.9", default-features = false, features = [
   "blocking",
-  "rustls-tls-native-roots"
+  "rustls-tls-native-roots",
 ] }
-serde = { version = "=1.0.193", features = ["derive"] }
-syntect = { version = "=5.1.0", default-features = false, features = [
+serde = { version = "=1.0.215", features = ["derive"] }
+syntect = { version = "=5.2.0", default-features = false, features = [
   "parsing",
   "default-syntaxes",
   "plist-load",
   "yaml-load",
-  "regex-onig"
+  "regex-onig",
 ] }
-tar = "=0.4.40"
-toml = "=0.5.11"
-vergen = { version = "=8.2.5", features = ["build", "git", "gitcl"] }
-walkdir = { version = "=2.4.0" }
+tar = "=0.4.43"
+toml = "=0.8.19"
+vergen = { version = "=9.0.1", features = ["build", "git", "gitcl"] }
+walkdir = { version = "=2.5.0" }
 
 [package.metadata.bin]
 cargo-about = { version = "0.6.0", locked = true }
