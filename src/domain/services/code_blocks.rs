@@ -25,7 +25,7 @@ impl CodeBlocks {
 
     pub fn blocks_from_slash_commands(&self, command: &SlashCommand) -> Result<String> {
         if self.codeblocks.is_empty() {
-            return Ok("".to_string());
+            return Ok(String::new());
         }
 
         let args = command
@@ -40,7 +40,7 @@ impl CodeBlocks {
         }
 
         let mut indexes = vec![];
-        for arg in args.iter() {
+        for arg in &args {
             for e in arg.split(',') {
                 let trimmed = arg.trim();
                 if trimmed.contains("..") {
@@ -48,7 +48,7 @@ impl CodeBlocks {
                     let first = self.validate_index(split[0])? - 1;
                     let last = self.validate_index(split[1])?;
 
-                    indexes.extend_from_slice(&(first..last).collect::<Vec<usize>>())
+                    indexes.extend_from_slice(&(first..last).collect::<Vec<usize>>());
                 } else {
                     indexes.push(self.validate_index(e)? - 1);
                 }

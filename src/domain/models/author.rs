@@ -18,6 +18,6 @@ impl std::fmt::Display for Author {
             Author::Oatmeal => String::from("Oatmeal"),
             Author::Model => Config::get(ConfigKey::Model),
         };
-        return write!(f, "{}", output);
+        return write!(f, "{output}");
     }
 }

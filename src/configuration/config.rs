@@ -49,7 +49,7 @@ impl Config {
             return val.to_string();
         }
 
-        return "".to_string();
+        return String::new();
     }
 
     pub fn set(key: ConfigKey, value: &str) {
@@ -58,7 +58,7 @@ impl Config {
 
     pub fn default(key: ConfigKey) -> String {
         if key == ConfigKey::Username {
-            let mut user = env::var("USER").unwrap_or_else(|_| return "".to_string());
+            let mut user = env::var("USER").unwrap_or_else(|_| return String::new());
             if user.is_empty() {
                 user = "User".to_string();
             }
@@ -117,7 +117,7 @@ impl Config {
 
     pub async fn load(cmd: Command, clap_arg_matches: Vec<&ArgMatches>) -> Result<()> {
         for key in ConfigKey::iter() {
-            Config::set(key, &Config::default(key))
+            Config::set(key, &Config::default(key));
         }
 
         let mut config_file = Config::default(ConfigKey::ConfigFile);
@@ -174,7 +174,7 @@ impl Config {
                     if val.is_empty() {
                         continue;
                     }
-                    Config::set(key, val)
+                    Config::set(key, val);
                 }
             }
         }
@@ -227,7 +227,7 @@ impl Config {
                         .map(|e| return e.get_name())
                         .collect::<Vec<_>>()
                         .join(", ");
-                    description = format!("{description} [possible values: {}]", possible_values);
+                    description = format!("{description} [possible values: {possible_values}]");
                 }
 
                 let mut val = Config::default(key);

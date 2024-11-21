@@ -194,7 +194,7 @@ impl Backend for LangChain {
 
         let msg = BackendResponse {
             author: Author::Model,
-            text: "".to_string(),
+            text: String::new(),
             done: true,
             context: Some("not-supported".to_string()),
         };

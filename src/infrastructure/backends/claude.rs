@@ -210,7 +210,7 @@ impl Backend for Claude {
         let stream = res.bytes_stream().map_err(convert_err);
         let mut lines_reader = StreamReader::new(stream).lines();
 
-        let mut last_message = "".to_string();
+        let mut last_message = String::new();
         while let Ok(line) = lines_reader.next_line().await {
             if line.is_none() {
                 break;
@@ -257,7 +257,7 @@ impl Backend for Claude {
 
         let msg = BackendResponse {
             author: Author::Model,
-            text: "".to_string(),
+            text: String::new(),
             done: true,
             context: Some(serde_json::to_string(&messages)?),
         };

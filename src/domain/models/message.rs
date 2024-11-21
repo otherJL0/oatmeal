@@ -55,7 +55,7 @@ impl Message {
                 if in_codeblock {
                     codeblocks.push(current_codeblock.join("\n"));
                     current_codeblock = vec![];
-                    in_codeblock = false
+                    in_codeblock = false;
                 } else {
                     in_codeblock = true;
                 }
