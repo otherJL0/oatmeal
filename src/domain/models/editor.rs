@@ -7,10 +7,10 @@ use std::fmt;
 use anyhow::Result;
 use async_trait::async_trait;
 use strum::EnumIter;
-use strum::EnumVariantNames;
 use strum::IntoEnumIterator;
+use strum::VariantNames;
 
-#[derive(Clone, Debug, PartialEq, Eq, EnumIter, EnumVariantNames, strum::Display)]
+#[derive(Clone, Debug, PartialEq, Eq, EnumIter, VariantNames, strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum EditorName {
     Neovim,

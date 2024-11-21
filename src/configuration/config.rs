@@ -12,8 +12,8 @@ use clap::Command;
 use dashmap::DashMap;
 use once_cell::sync::Lazy;
 use strum::EnumIter;
-use strum::EnumVariantNames;
 use strum::IntoEnumIterator;
+use strum::VariantNames;
 use tokio::fs;
 
 use crate::domain::models::BackendName;
@@ -21,7 +21,7 @@ use crate::domain::models::EditorName;
 
 static CONFIG: Lazy<DashMap<String, String>> = Lazy::new(DashMap::new);
 
-#[derive(Clone, Copy, Eq, PartialEq, EnumIter, EnumVariantNames, strum::Display)]
+#[derive(Clone, Copy, Eq, PartialEq, EnumIter, VariantNames, strum::Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ConfigKey {
     Backend,
@@ -132,7 +132,7 @@ impl Config {
         let config_path = path::PathBuf::from(config_file);
         if config_path.exists() {
             let toml_str = fs::read_to_string(config_path).await?;
-            let doc = toml_str.parse::<toml_edit::Document>()?;
+            let doc = toml_str.parse::<toml_edit::DocumentMut>()?;
 
             for key in ConfigKey::iter() {
                 if let Some(val) = doc.get(&key.to_string()) {
