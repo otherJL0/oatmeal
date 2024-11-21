@@ -177,7 +177,7 @@ fn copy_messages(messages: Vec<Message>, tx: &mpsc::UnboundedSender<Event>) -> R
         payload = messages
             .iter()
             .map(|message| {
-                return format!("{}: {}", message.author.to_string(), message.text);
+                return format!("{}: {}", message.author, message.text);
             })
             .collect::<Vec<String>>()
             .join("\n\n");
