@@ -129,7 +129,7 @@ syntect = { version = "=5.2.0", default-features = false, features = [
 ] }
 tar = "=0.4.43"
 toml = "=0.8.19"
-vergen = { version = "=9.0.1", features = ["build", "git", "gitcl"] }
+vergen = { version = "=8.2.5", features = ["build", "git", "gitcl"] }
 walkdir = { version = "=2.5.0" }
 
 [package.metadata.bin]
