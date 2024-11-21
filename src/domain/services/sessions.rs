@@ -77,7 +77,7 @@ impl Sessions {
                 session.state.messages = vec![];
             }
 
-            session.state.backend_context = "".to_string();
+            session.state.backend_context = String::new();
             sessions.push(session);
         }
 
@@ -112,7 +112,7 @@ impl Sessions {
             backend_name: Config::get(ConfigKey::Backend),
             backend_model: Config::get(ConfigKey::Model),
             backend_context: backend_context.to_string(),
-            editor_language: "".to_string(),
+            editor_language: String::new(),
             messages: messages.to_vec(),
         };
 

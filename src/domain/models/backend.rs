@@ -56,7 +56,7 @@ impl BackendPrompt {
                 self.text += &code_prompt;
             }
         } else {
-            self.text += ". Add language to any code blocks."
+            self.text += ". Add language to any code blocks.";
         }
     }
 }

@@ -42,7 +42,7 @@ fn format_session(session: &Session) -> String {
     );
 
     if !session.state.editor_language.is_empty() {
-        res = format!("{res}, Lang: {}", session.state.editor_language)
+        res = format!("{res}, Lang: {}", session.state.editor_language);
     }
 
     if !session.state.messages.is_empty() {
@@ -429,7 +429,7 @@ pub async fn parse() -> Result<bool> {
                 Some(("resolve-syntax", rs_matches)) => {
                     let entry = rs_matches.get_one::<String>("entry").unwrap();
                     let res = Syntaxes::get(entry);
-                    println!("{:?}", res);
+                    println!("{res:?}");
                 }
                 Some(("themes", _)) => {
                     println!("{}", Themes::list().join("\n"));
@@ -440,7 +440,7 @@ pub async fn parse() -> Result<bool> {
                 }
                 Some(("enum-config", _)) => {
                     let res = ConfigKey::VARIANTS.join("\n");
-                    println!("{}", res);
+                    println!("{res}");
                 }
                 _ => {
                     subcommand_debug().print_long_help()?;

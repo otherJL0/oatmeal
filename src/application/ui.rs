@@ -52,7 +52,7 @@ fn is_line_width_sufficient(line_width: u16) -> bool {
     let min_width =
         (author_lengths + bubble_style.bubble_padding + bubble_style.border_elements_length) as i32;
     let trimmed_line_width =
-        ((line_width as f32 * (1.0 - bubble_style.outer_padding_percentage)).ceil()) as i32;
+        ((f32::from(line_width) * (1.0 - bubble_style.outer_padding_percentage)).ceil()) as i32;
 
     return trimmed_line_width >= min_width;
 }

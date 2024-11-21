@@ -87,7 +87,7 @@ fn download_files(download_folder: PathBuf, asset: Asset) -> Result<()> {
                 .to_string_lossy()
                 .to_string();
 
-            for req_file in asset.files.clone().into_iter() {
+            for req_file in asset.files.clone() {
                 if glob_match(&format!("*/{req_file}"), &filepath) {
                     let dir = entry
                         .path()?
@@ -119,7 +119,7 @@ fn download_files(download_folder: PathBuf, asset: Asset) -> Result<()> {
             return Err(anyhow!("No matching file"));
         })
         .filter_map(|e| return e.ok())
-        .for_each(|x| println!("> {}", x));
+        .for_each(|x| println!("> {x}"));
 
     return Ok(());
 }

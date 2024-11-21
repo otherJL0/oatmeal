@@ -21,7 +21,7 @@ use crate::domain::models::SlashCommand;
 use crate::infrastructure::editors::EditorManager;
 
 pub fn help_text() -> String {
-    let text = r#"
+    let text = r"
 COMMANDS:
 - /modellist (/ml) - Lists all available models from the backend.
 - /model (/model) [MODEL_NAME,MODEL_INDEX] - Sets the specified model as the active model. You can pass either the model name, or the index from `/modellist`.
@@ -52,7 +52,7 @@ The `CODE_BLOCK_NUMBER` allows you to select several code blocks to send back to
 - `1,3,5` - Selects code blocks 1, 3, and 5.
 - `2..5`- Selects an inclusive range of code blocks between 2 and 5.
 - None - Selects the last provided code block.
-        "#;
+        ";
 
     return text.trim().to_string();
 }
@@ -204,7 +204,7 @@ fn worker_error(err: anyhow::Error, tx: &mpsc::UnboundedSender<Event>) -> Result
     tx.send(Event::BackendMessage(Message::new_with_type(
         Author::Oatmeal,
         MessageType::Error,
-        &format!("The backend failed with the following error: {:?}", err),
+        &format!("The backend failed with the following error: {err:?}"),
     )))?;
 
     return Ok(());
