@@ -13,7 +13,7 @@ exclude = [
   ".rustfmt.toml",
   "cliff.toml",
   "committed.toml",
-  "deny.toml"
+  "deny.toml",
 ]
 keywords = ["cli", "llm", "chat", "tui"]
 license = "MIT"
@@ -31,7 +31,9 @@ members = ["tools/xtask"]
 
 [dependencies]
 anyhow = { version = "=1.0.75", features = ["backtrace"] }
-arboard = { version = "=3.2.1", default-features = false, features = ["wayland-data-control"] }
+arboard = { version = "=3.2.1", default-features = false, features = [
+  "wayland-data-control",
+] }
 async-trait = "=0.1.74"
 base64 = "=0.21.5"
 better-panic = "=0.3.0"
@@ -40,10 +42,15 @@ chrono = { version = "=0.4.31", default-features = false, features = ["clock"] }
 clap = { version = "=4.4.7", features = ["env", "string"] }
 clap_complete = "=4.4.4"
 clap_mangen = { version = "=0.2.15" }
-crossterm = { version = "=0.27.0", features = ["bracketed-paste", "event-stream"] }
+crossterm = { version = "=0.27.0", features = [
+  "bracketed-paste",
+  "event-stream",
+] }
 dashmap = "=5.5.3"
 dhat = { version = "=0.3.2", optional = true }
-dialoguer = { version = "=0.10.4", default-features = false, features = ["editor"] }
+dialoguer = { version = "=0.10.4", default-features = false, features = [
+  "editor",
+] }
 dirs = "=5.0.0"
 dirs-sys = "=0.4.0" # Pinned sub dependency to avoid poor choices in later versions.
 futures = "=0.3.28"
@@ -55,7 +62,7 @@ reqwest = { version = "=0.11.22", default-features = false, features = [
   "stream",
   "json",
   "gzip",
-  "rustls-tls-native-roots"
+  "rustls-tls-native-roots",
 ] }
 serde = { version = "=1.0.193", features = ["derive"] }
 serde_json = "=1.0.107"
@@ -64,15 +71,29 @@ strum = { version = "=0.25.0", features = ["derive"] }
 syntect = { version = "=5.1.0", default-features = false, features = [
   "parsing",
   "plist-load",
-  "regex-onig"
+  "regex-onig",
 ] }
-tokio = { version = "=1.33.0", features = ["fs", "macros", "rt-multi-thread", "sync", "process"] }
+tokio = { version = "=1.33.0", features = [
+  "fs",
+  "macros",
+  "rt-multi-thread",
+  "sync",
+  "process",
+] }
 tokio-util = "=0.7.9"
 toml_edit = "=0.21.0"
-tracing = { version = "=0.1.40", default-features = false, features = ["std", "log"] }
+tracing = { version = "=0.1.40", default-features = false, features = [
+  "std",
+  "log",
+] }
 tracing-appender = "=0.2.3"
-tracing-subscriber = { version = "=0.3.18", default-features = false, features = ["json"] }
-tui-textarea = { version = "=0.4.0", default-features = false, features = ["crossterm", "ratatui"] }
+tracing-subscriber = { version = "=0.3.18", default-features = false, features = [
+  "json",
+] }
+tui-textarea = { version = "=0.4.0", default-features = false, features = [
+  "crossterm",
+  "ratatui",
+] }
 uuid = { version = "=1.6.1", features = ["v4"] }
 yansi = "=0.5.1"
 
@@ -81,7 +102,9 @@ yansi = "=0.5.1"
 errno = "=0.3.5"
 
 [dev-dependencies]
-cargo-husky = { version = "=1.5.0", default-features = false, features = ["user-hooks"] }
+cargo-husky = { version = "=1.5.0", default-features = false, features = [
+  "user-hooks",
+] }
 insta = { version = "=1.34.0", features = ["toml", "yaml"] }
 mockito = "=1.2.0"
 tempfile = "=3.8.1"
@@ -94,7 +117,7 @@ flate2 = "=1.0.28"
 glob-match = "=0.2.1"
 reqwest = { version = "=0.11.22", default-features = false, features = [
   "blocking",
-  "rustls-tls-native-roots"
+  "rustls-tls-native-roots",
 ] }
 serde = { version = "=1.0.193", features = ["derive"] }
 syntect = { version = "=5.1.0", default-features = false, features = [
@@ -102,7 +125,7 @@ syntect = { version = "=5.1.0", default-features = false, features = [
   "default-syntaxes",
   "plist-load",
   "yaml-load",
-  "regex-onig"
+  "regex-onig",
 ] }
 tar = "=0.4.40"
 toml = "=0.5.11"
@@ -111,7 +134,7 @@ walkdir = { version = "=2.4.0" }
 
 [package.metadata.bin]
 cargo-about = { version = "0.6.0", locked = true }
-cargo-binstall = { version = "1.4.9", git = "https://github.com/dustinblackman/cargo-binstall", rev = "ce72b764eeeceab8bce907cb3d4ffedff7e1e7e3" }
+cargo-binstall = { version = "1.10.13", locked = true }
 cargo-cmd = { version = "0.3.1", locked = true }
 cargo-deny = { version = "0.14.2", locked = true }
 cargo-gha = { version = "1.0.2", locked = true }
