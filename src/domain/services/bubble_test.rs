@@ -83,7 +83,7 @@ fn print_numbers() {
         .trim();
     let lines_str = create_lines(Author::Model, BubbleAlignment::Left, 0, text)?;
 
-    insta::assert_snapshot!(lines_str, @r###"
+    insta::assert_snapshot!(lines_str, @r#"
     ╭model-1───────────────────────╮              
     │ Here's how to print in Rust. │              
     │                              │              
@@ -94,8 +94,8 @@ fn print_numbers() {
     │     }                        │              
     │ }                            │              
     │ ```                          │              
-    ╰──────────────────────────────╯              
-    "###);
+    ╰──────────────────────────────╯
+    "#);
     return Ok(());
 }
 
