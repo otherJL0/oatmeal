@@ -37,8 +37,12 @@ fn to_res(action: Option<Event>) -> Result<BackendResponse> {
 
 #[tokio::test]
 async fn it_successfully_health_checks() {
-    let mut server = mockito::Server::new();
-    let mock = server.mock("GET", "/").with_status(200).create();
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock("GET", "/")
+        .with_status(200)
+        .create_async()
+        .await;
 
     let backend = OpenAI::with_url(server.url());
     let res = backend.health_check().await;
@@ -57,8 +61,12 @@ async fn it_successfully_health_checks_with_official_api() {
 
 #[tokio::test]
 async fn it_fails_health_checks() {
-    let mut server = mockito::Server::new();
-    let mock = server.mock("GET", "/").with_status(500).create();
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock("GET", "/")
+        .with_status(500)
+        .create_async()
+        .await;
 
     let backend = OpenAI::with_url(server.url());
     let res = backend.health_check().await;
@@ -80,13 +88,14 @@ async fn it_lists_models() -> Result<()> {
         ],
     })?;
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/v1/models")
         .match_header("Authorization", "Bearer abc")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let backend = OpenAI::with_url(server.url());
     let res = backend.list_models().await?;
@@ -133,13 +142,14 @@ async fn it_gets_completions() -> Result<()> {
         }])?,
     };
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("POST", "/v1/chat/completions")
         .match_header("Authorization", "Bearer abc")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let (tx, mut rx) = mpsc::unbounded_channel::<Event>();
 
