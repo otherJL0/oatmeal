@@ -104,7 +104,7 @@ async fn start_loop<B: Backend>(
 
             frame.render_stateful_widget(
                 Scrollbar::new(ScrollbarOrientation::VerticalRight),
-                layout[0].inner(&Margin {
+                layout[0].inner(Margin {
                     vertical: 1,
                     horizontal: 0,
                 }),

@@ -42,7 +42,7 @@ chrono = { version = "=0.4.31", default-features = false, features = ["clock"] }
 clap = { version = "=4.4.7", features = ["env", "string"] }
 clap_complete = "=4.4.4"
 clap_mangen = { version = "=0.2.15" }
-crossterm = { version = "=0.27.0", features = [
+crossterm = { version = "=0.28.1", features = [
   "bracketed-paste",
   "event-stream",
 ] }
@@ -56,7 +56,7 @@ dirs-sys = "=0.4.0" # Pinned sub dependency to avoid poor choices in later versi
 futures = "=0.3.28"
 itertools = "=0.11.0"
 once_cell = "=1.18.0"
-ratatui = "=0.24.0"
+ratatui = "=0.29.0"
 regex = "=1.10.3"
 reqwest = { version = "=0.11.22", default-features = false, features = [
   "stream",
@@ -90,7 +90,7 @@ tracing-appender = "=0.2.3"
 tracing-subscriber = { version = "=0.3.18", default-features = false, features = [
   "json",
 ] }
-tui-textarea = { version = "=0.4.0", default-features = false, features = [
+tui-textarea = { version = "=0.7.0", default-features = false, features = [
   "crossterm",
   "ratatui",
 ] }
@@ -99,7 +99,7 @@ yansi = "=0.5.1"
 
 # Fix for cargo-about
 [target.'cfg(target_os="macos")'.dependencies]
-errno = "=0.3.5"
+errno = "=0.3.9"
 
 [dev-dependencies]
 cargo-husky = { version = "=1.5.0", default-features = false, features = [
