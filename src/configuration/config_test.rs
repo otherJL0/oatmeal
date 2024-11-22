@@ -7,7 +7,7 @@ use crate::application::cli;
 #[test]
 fn it_serializes_to_valid_toml() {
     let res = Config::serialize_default(cli::build());
-    let toml_res = res.parse::<toml_edit::Document>();
+    let toml_res = res.parse::<toml_edit::DocumentMut>();
     assert!(toml_res.is_ok());
 
     insta_snapshot(|| {
