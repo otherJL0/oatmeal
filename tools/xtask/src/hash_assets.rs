@@ -3,7 +3,7 @@ use std::process;
 
 use anyhow::Result;
 use toml_edit::value;
-use toml_edit::Document;
+use toml_edit::DocumentMut;
 
 fn hash(url: String) -> Result<String> {
     println!("Hashing {url}");
@@ -31,7 +31,7 @@ fn hash(url: String) -> Result<String> {
 
 pub fn update(force: bool) -> Result<()> {
     let toml_str = fs::read_to_string("./assets.toml")?;
-    let mut doc = toml_str.parse::<Document>()?;
+    let mut doc = toml_str.parse::<DocumentMut>()?;
 
     for key in ["syntaxes", "themes"] {
         for entry in doc[key].as_array_of_tables_mut().unwrap().iter_mut() {
