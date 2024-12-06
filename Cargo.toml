@@ -1,3 +1,5 @@
+cargo-features = ["codegen-backend"]
+
 [package]
 name = "oatmeal"
 version = "0.13.0"
@@ -162,6 +164,9 @@ strip = "symbols"
 [profile.release-windows]
 inherits = "release"
 strip = "none"
+
+[profile.dev]
+codegen-backend = "cranelift"
 
 [profile.dev.package]
 insta.opt-level = 3
