@@ -58,7 +58,7 @@ impl<'a> Bubble<'_> {
         alignment: BubbleAlignment,
         window_max_width: usize,
         codeblock_counter: usize,
-    ) -> Bubble {
+    ) -> Bubble<'a> {
         return Bubble {
             alignment,
             message,
