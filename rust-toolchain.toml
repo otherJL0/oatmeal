@@ -1,3 +1,9 @@
 [toolchain]
-channel = "1.82.0"
-components = ["rustfmt", "clippy", "llvm-tools-preview", "rust-analyzer"]
+channel = "1.85.0"
+components = [
+  "rustfmt",
+  "clippy",
+  "llvm-tools-preview",
+  "rust-analyzer",
+  "rustc-codegen-cranelift-preview",
+]
