@@ -36,6 +36,28 @@ impl EventsService {
                     MouseEventKind::ScrollDown => {
                         return Some(Event::UIScrollDown());
                     }
+                    MouseEventKind::Down(button) => {
+                        match button {
+                            crossterm::event::MouseButton::Right => {
+                                return Some(Event::KeyboardPaste(format!(
+                                    "left: row={}, column={}\n",
+                                    mouseevent.row, mouseevent.column,
+                                )));
+                            }
+                            crossterm::event::MouseButton::Left => {
+                                return Some(Event::KeyboardPaste(String::from("left\n")));
+                            }
+                            crossterm::event::MouseButton::Middle => {
+                                return Some(Event::Select((mouseevent.row, mouseevent.column)));
+                            }
+                        };
+                    }
+                    MouseEventKind::Drag(crossterm::event::MouseButton::Left) => {
+                        return Some(Event::KeyboardPaste(format!(
+                            "dag with left: row={}, column={}\n",
+                            mouseevent.row, mouseevent.column,
+                        )));
+                    }
                     _ => {
                         return None;
                     }

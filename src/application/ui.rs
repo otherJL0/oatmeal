@@ -242,6 +242,11 @@ async fn start_loop<B: Backend>(
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
             }
+            Event::Select((x, y)) => {
+                app_state.exit_warning = false;
+                textarea.set_yank_text(format!("live from ui.rs! x={}, y={}\n", x, y));
+                textarea.paste();
+            }
         }
     }
 
