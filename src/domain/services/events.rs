@@ -39,17 +39,11 @@ impl EventsService {
                     MouseEventKind::ScrollDown => {
                         return Some(Event::UIScrollDown());
                     }
-                    MouseEventKind::Down(MouseButton::Right) => {
+                    MouseEventKind::Down(MouseButton::Left) => {
                         self.selection_start = Some(mouseevent.row);
                         return None;
                     }
-                    // MouseEventKind::Drag(MouseButton::Left) => {
-                    //     return Some(Event::KeyboardPaste(format!(
-                    //         "dag with left: row={}, column={}\n",
-                    //         mouseevent.row, mouseevent.column,
-                    //     )));
-                    // }
-                    MouseEventKind::Up(MouseButton::Right) => {
+                    MouseEventKind::Up(MouseButton::Left) => {
                         assert!(self.selection_start.is_some());
                         let selection =
                             Event::Select((self.selection_start.unwrap(), mouseevent.row));
