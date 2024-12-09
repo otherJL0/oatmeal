@@ -21,7 +21,7 @@ struct BubbleCacheEntry<'a> {
 }
 
 pub struct BubbleList<'a> {
-    pub cache: BTreeMap<usize, BubbleCacheEntry<'a>>,
+    cache: BTreeMap<usize, BubbleCacheEntry<'a>>,
     pub line_width: usize,
     pub lines_len: usize,
     pub theme: Theme,
