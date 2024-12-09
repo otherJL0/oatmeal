@@ -39,6 +39,12 @@ use crate::domain::services::Sessions;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
 
+fn trim_line(line: String) -> String {
+    return line
+        .trim_matches(|c: char| return c.is_whitespace() || c == '│')
+        .to_string();
+}
+
 /// Verifies that the current window size is large enough to handle the bare
 /// minimum width that includes the model name, username, bubbles, and padding.
 fn is_line_width_sufficient(line_width: u16) -> bool {
@@ -248,27 +254,51 @@ async fn start_loop<B: Backend>(
                 let end = x.max(y);
                 textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
                 textarea.delete_line_by_end();
-                if start == end {
-                    let position = y as usize + app_state.scroll.position;
-                    if let Some(line) = app_state.bubble_list.get_line(position) {
-                        textarea.set_yank_text(format!("{}", line));
-                    } else {
-                        textarea.set_yank_text(String::from(""));
-                    }
-                } else {
-                    let mut lines: Vec<String> =
-                        Vec::with_capacity(end as usize - start as usize + 1);
-                    for line_idx in start..=end {
-                        lines.push(
-                            app_state
-                                .bubble_list
-                                .get_line(line_idx as usize)
-                                .unwrap()
-                                .to_string(),
-                        );
-                    }
-                    textarea.set_yank_text(lines.join("\n"));
+                let mut lines: Vec<String> = Vec::with_capacity(end as usize - start as usize + 1);
+                for line_idx in start..=end {
+                    lines.push(trim_line(
+                        app_state
+                            .bubble_list
+                            .get_line(line_idx as usize)
+                            .unwrap()
+                            .to_string(),
+                    ));
                 }
+                textarea.set_yank_text(lines.join("\n"));
+                tx.send(Action::CopyMessages(
+                    lines
+                        .into_iter()
+                        .map(|line: String| return Message::new(Author::Model, line.as_str()))
+                        .collect(),
+                ))?;
+                // if start == end {
+                //     let position = y as usize + app_state.scroll.position;
+                //     if let Some(line) = app_state.bubble_list.get_line(position) {
+                //         textarea.set_yank_text(trim_line(line.to_string()));
+                //     } else {
+                //         textarea.set_yank_text(String::from(""));
+                //     }
+                // } else {
+                //     let mut lines: Vec<String> =
+                //         Vec::with_capacity(end as usize - start as usize + 1);
+                //     for line_idx in start..=end {
+                //         lines.push(trim_line(
+                //             app_state
+                //                 .bubble_list
+                //                 .get_line(line_idx as usize)
+                //                 .unwrap()
+                //                 .to_string(),
+                //         ));
+                //     }
+                //     textarea.set_yank_text(lines.join("\n"));
+                // tx.send(Action::CopyMessages(
+                //     lines
+                //         .into_iter()
+                //         .map(|line: String| return
+                // Message::new(Author::Model, line.as_str()))
+                //         .collect(),
+                // ))?;
+                // }
                 textarea.paste();
                 textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
             }
