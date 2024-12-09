@@ -21,6 +21,7 @@ use tokio::sync::mpsc;
 
 use crate::configuration::Config;
 use crate::configuration::ConfigKey;
+use crate::domain::models::AcceptType;
 use crate::domain::models::Action;
 use crate::domain::models::Author;
 use crate::domain::models::BackendName;
@@ -252,8 +253,6 @@ async fn start_loop<B: Backend>(
                 app_state.exit_warning = false;
                 let start = x.min(y);
                 let end = x.max(y);
-                textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
-                textarea.delete_line_by_end();
                 let mut lines: Vec<String> = Vec::with_capacity(end as usize - start as usize + 1);
                 for line_idx in start..=end {
                     lines.push(trim_line(
@@ -264,43 +263,11 @@ async fn start_loop<B: Backend>(
                             .to_string(),
                     ));
                 }
-                textarea.set_yank_text(lines.join("\n"));
-                tx.send(Action::CopyMessages(
-                    lines
-                        .into_iter()
-                        .map(|line: String| return Message::new(Author::Model, line.as_str()))
-                        .collect(),
+                tx.send(Action::AcceptCodeBlock(
+                    app_state.editor_context.clone(),
+                    lines.join("\n"),
+                    AcceptType::Replace,
                 ))?;
-                // if start == end {
-                //     let position = y as usize + app_state.scroll.position;
-                //     if let Some(line) = app_state.bubble_list.get_line(position) {
-                //         textarea.set_yank_text(trim_line(line.to_string()));
-                //     } else {
-                //         textarea.set_yank_text(String::from(""));
-                //     }
-                // } else {
-                //     let mut lines: Vec<String> =
-                //         Vec::with_capacity(end as usize - start as usize + 1);
-                //     for line_idx in start..=end {
-                //         lines.push(trim_line(
-                //             app_state
-                //                 .bubble_list
-                //                 .get_line(line_idx as usize)
-                //                 .unwrap()
-                //                 .to_string(),
-                //         ));
-                //     }
-                //     textarea.set_yank_text(lines.join("\n"));
-                // tx.send(Action::CopyMessages(
-                //     lines
-                //         .into_iter()
-                //         .map(|line: String| return
-                // Message::new(Author::Model, line.as_str()))
-                //         .collect(),
-                // ))?;
-                // }
-                textarea.paste();
-                textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
             }
         }
     }
