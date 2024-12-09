@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use ratatui::prelude::Buffer;
 use ratatui::prelude::Rect;
@@ -21,16 +21,16 @@ struct BubbleCacheEntry<'a> {
 }
 
 pub struct BubbleList<'a> {
-    cache: HashMap<usize, BubbleCacheEntry<'a>>,
-    line_width: usize,
-    lines_len: usize,
-    theme: Theme,
+    pub cache: BTreeMap<usize, BubbleCacheEntry<'a>>,
+    pub line_width: usize,
+    pub lines_len: usize,
+    pub theme: Theme,
 }
 
 impl<'a> BubbleList<'a> {
     pub fn new(theme: Theme) -> BubbleList<'a> {
         return BubbleList {
-            cache: HashMap::new(),
+            cache: BTreeMap::new(),
             line_width: 0,
             lines_len: 0,
             theme,
