@@ -244,8 +244,19 @@ async fn start_loop<B: Backend>(
             }
             Event::Select((x, y)) => {
                 app_state.exit_warning = false;
-                textarea.set_yank_text(format!("live from ui.rs! x={}, y={}\n", x, y));
+                let position = y as usize + app_state.scroll.position;
+                if let Some(line) = app_state.bubble_list.get_line(position) {
+                    textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
+                    textarea.delete_line_by_end();
+                    textarea.set_yank_text(format!(
+                        "live from ui.rs! scroll={}, x={}, y={}, position={}, line={}",
+                        app_state.scroll.position, x, y, position, line
+                    ));
+                } else {
+                    textarea.set_yank_text(String::from(""));
+                }
                 textarea.paste();
+                textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
             }
         }
     }

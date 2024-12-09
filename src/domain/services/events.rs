@@ -38,17 +38,17 @@ impl EventsService {
                     }
                     MouseEventKind::Down(button) => {
                         match button {
-                            crossterm::event::MouseButton::Right => {
+                            crossterm::event::MouseButton::Left => {
                                 return Some(Event::KeyboardPaste(format!(
                                     "left: row={}, column={}\n",
                                     mouseevent.row, mouseevent.column,
                                 )));
                             }
-                            crossterm::event::MouseButton::Left => {
-                                return Some(Event::KeyboardPaste(String::from("left\n")));
-                            }
                             crossterm::event::MouseButton::Middle => {
-                                return Some(Event::Select((mouseevent.row, mouseevent.column)));
+                                return Some(Event::KeyboardPaste(String::from("Middle\n")));
+                            }
+                            crossterm::event::MouseButton::Right => {
+                                return Some(Event::Select((mouseevent.column, mouseevent.row)));
                             }
                         };
                     }
