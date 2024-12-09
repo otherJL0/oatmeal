@@ -114,4 +114,17 @@ impl<'a> BubbleList<'a> {
             }
         }
     }
+
+    pub fn get_line(&self, line_idx: usize) -> Option<&Line<'a>> {
+        let mut bubble_first_line_idx: usize = 0;
+        for cache_entry in self.cache.values() {
+            let bubble_last_line_idx = bubble_first_line_idx + cache_entry.lines.len() - 1;
+            if line_idx >= bubble_first_line_idx && line_idx <= bubble_last_line_idx {
+                let bubble_line = line_idx - bubble_first_line_idx;
+                return cache_entry.lines.get(bubble_line);
+            }
+            bubble_first_line_idx = bubble_last_line_idx + 1;
+        }
+        return None;
+    }
 }
