@@ -244,16 +244,30 @@ async fn start_loop<B: Backend>(
             }
             Event::Select((x, y)) => {
                 app_state.exit_warning = false;
-                let position = y as usize + app_state.scroll.position;
-                if let Some(line) = app_state.bubble_list.get_line(position) {
-                    textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
-                    textarea.delete_line_by_end();
-                    textarea.set_yank_text(format!(
-                        "live from ui.rs! scroll={}, x={}, y={}, position={}, line={}",
-                        app_state.scroll.position, x, y, position, line
-                    ));
+                let start = x.min(y);
+                let end = x.max(y);
+                textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
+                textarea.delete_line_by_end();
+                if start == end {
+                    let position = y as usize + app_state.scroll.position;
+                    if let Some(line) = app_state.bubble_list.get_line(position) {
+                        textarea.set_yank_text(format!("{}", line));
+                    } else {
+                        textarea.set_yank_text(String::from(""));
+                    }
                 } else {
-                    textarea.set_yank_text(String::from(""));
+                    let mut lines: Vec<String> =
+                        Vec::with_capacity(end as usize - start as usize + 1);
+                    for line_idx in start..=end {
+                        lines.push(
+                            app_state
+                                .bubble_list
+                                .get_line(line_idx as usize)
+                                .unwrap()
+                                .to_string(),
+                        );
+                    }
+                    textarea.set_yank_text(lines.join("\n"));
                 }
                 textarea.paste();
                 textarea.move_cursor(tui_textarea::CursorMove::Jump(0, 0));
