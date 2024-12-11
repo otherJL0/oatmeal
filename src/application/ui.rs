@@ -21,6 +21,7 @@ use tokio::sync::mpsc;
 
 use crate::configuration::Config;
 use crate::configuration::ConfigKey;
+use crate::domain::models::AcceptType;
 use crate::domain::models::Action;
 use crate::domain::models::Author;
 use crate::domain::models::BackendName;
@@ -38,6 +39,12 @@ use crate::domain::services::Bubble;
 use crate::domain::services::Sessions;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
+
+fn trim_line(line: String) -> String {
+    return line
+        .trim_matches(|c: char| return c.is_whitespace() || c == '│')
+        .to_string();
+}
 
 /// Verifies that the current window size is large enough to handle the bare
 /// minimum width that includes the model name, username, bubbles, and padding.
@@ -241,6 +248,26 @@ async fn start_loop<B: Backend>(
             }
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
+            }
+            Event::Select((x, y)) => {
+                app_state.exit_warning = false;
+                let start = x.min(y);
+                let end = x.max(y);
+                let mut lines: Vec<String> = Vec::with_capacity(end as usize - start as usize + 1);
+                for line_idx in start..=end {
+                    lines.push(trim_line(
+                        app_state
+                            .bubble_list
+                            .get_line(line_idx as usize)
+                            .unwrap()
+                            .to_string(),
+                    ));
+                }
+                tx.send(Action::AcceptCodeBlock(
+                    app_state.editor_context.clone(),
+                    lines.join("\n"),
+                    AcceptType::Replace,
+                ))?;
             }
         }
     }
