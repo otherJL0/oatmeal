@@ -251,9 +251,10 @@ async fn start_loop<B: Backend>(
             }
             Event::Select((x, y)) => {
                 app_state.exit_warning = false;
-                let start = x.min(y);
-                let end = x.max(y);
-                let mut lines: Vec<String> = Vec::with_capacity(end as usize - start as usize + 1);
+                let position = app_state.scroll.position;
+                let start = position + x.min(y) as usize;
+                let end = position + x.max(y) as usize;
+                let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
                     lines.push(trim_line(
                         app_state
