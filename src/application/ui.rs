@@ -256,13 +256,9 @@ async fn start_loop<B: Backend>(
                 let end = position + x.max(y) as usize;
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
-                    lines.push(trim_line(
-                        app_state
-                            .bubble_list
-                            .get_line(line_idx as usize)
-                            .unwrap()
-                            .to_string(),
-                    ));
+                    if let Some(selected) = app_state.bubble_list.get_line(line_idx) {
+                        lines.push(trim_line(selected.to_string()));
+                    }
                 }
                 tx.send(Action::AcceptCodeBlock(
                     app_state.editor_context.clone(),
