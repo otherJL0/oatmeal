@@ -40,10 +40,14 @@ use crate::domain::services::Sessions;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
 
-fn trim_line(line: String) -> String {
-    return line
-        .trim_matches(|c: char| return c.is_whitespace() || c == '│')
-        .to_string();
+fn trim_line(line: String) -> Option<String> {
+    if line.trim().ends_with("─╮") || line.trim().ends_with("─╯") {
+        return None;
+    }
+    return Some(
+        line.trim_matches(|c: char| return c.is_whitespace() || c == '│')
+            .to_string(),
+    );
 }
 
 /// Verifies that the current window size is large enough to handle the bare
@@ -81,7 +85,7 @@ async fn start_loop<B: Backend>(
         textarea.insert_str(test_str);
     }
 
-    loop {
+    'outer: loop {
         terminal.draw(|frame| {
             if !is_line_width_sufficient(frame.area().width) {
                 frame.render_widget(
@@ -257,7 +261,14 @@ async fn start_loop<B: Backend>(
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
                     if let Some(selected) = app_state.bubble_list.get_line(line_idx) {
-                        lines.push(trim_line(selected.to_string()));
+                        if let Some(selected_line) = trim_line(selected.to_string()) {
+                            lines.push(selected_line);
+                        }
+                    } else {
+                        if lines.is_empty() {
+                            continue 'outer;
+                        }
+                        break;
                     }
                 }
                 tx.send(Action::AcceptCodeBlock(
