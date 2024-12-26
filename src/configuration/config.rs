@@ -92,6 +92,9 @@ impl Config {
             }
         }
 
+        let anthropic_api_key = env::var("ANTHROPIC_API_KEY").unwrap_or_default();
+        let openai_api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
+        let gemini_api_key = env::var("GEMINI_API_KEY").unwrap_or_default();
         let res = match key {
             ConfigKey::Backend => &default_backend,
             ConfigKey::BackendHealthCheckTimeout => "1000",
@@ -99,10 +102,10 @@ impl Config {
             ConfigKey::Model => "",
             ConfigKey::LangChainURL => "http://localhost:8000",
             ConfigKey::OllamaURL => "http://localhost:11434",
-            ConfigKey::OpenAiToken => "",
+            ConfigKey::OpenAiToken => openai_api_key.as_str(),
             ConfigKey::OpenAiURL => "https://api.openai.com",
-            ConfigKey::ClaudeToken => "",
-            ConfigKey::GeminiToken => "",
+            ConfigKey::ClaudeToken => anthropic_api_key.as_str(),
+            ConfigKey::GeminiToken => gemini_api_key.as_str(),
             ConfigKey::Theme => "base16-onedark",
             ConfigKey::ThemeFile => "",
 
