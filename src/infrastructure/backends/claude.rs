@@ -140,7 +140,7 @@ impl Backend for Claude {
             "claude-2.0".to_string(),
         ];
         let res = reqwest::Client::new()
-            .get("https://raw.githubusercontent.com/anthropics/anthropic-sdk-typescript/main/src/resources/messages.ts")
+            .get("https://raw.githubusercontent.com/anthropics/anthropic-sdk-typescript/main/src/resources/messages/messages.ts")
             .send()
             .await;
 
