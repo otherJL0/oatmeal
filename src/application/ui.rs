@@ -45,7 +45,8 @@ fn trim_line(line: String) -> Option<String> {
         return None;
     }
     return Some(
-        line.trim_matches(|c: char| return c.is_whitespace() || c == '│')
+        line.trim_start_matches("│ ")
+            .trim_end_matches(|c: char| return c.is_whitespace() || c == '│')
             .to_string(),
     );
 }
