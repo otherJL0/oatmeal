@@ -228,7 +228,7 @@ lint-fix = '''set -e
 
 get-nightly-name = 'echo oatmeal-nightly'
 setup-nightly = '''
-  export NIGHTLY=nightly
+  export NIGHTLY=nightly-2024-12-25
   rustup toolchain list -v | grep -q "$NIGHTLY" || rustup toolchain install "$NIGHTLY" --force --component llvm-tools-preview rustfmt
   rustup toolchain link oatmeal-nightly "$(rustup toolchain list -v | grep $NIGHTLY | grep '^nightly-' | awk '{print $2}')"
 '''
