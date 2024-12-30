@@ -15,7 +15,7 @@ exclude = [
   ".rustfmt.toml",
   "cliff.toml",
   "committed.toml",
-  "deny.toml",
+  "deny.toml"
 ]
 keywords = ["cli", "llm", "chat", "tui"]
 license = "MIT"
@@ -33,9 +33,7 @@ members = ["tools/xtask"]
 
 [dependencies]
 anyhow = { version = "=1.0.95", features = ["backtrace"] }
-arboard = { version = "=3.4.1", default-features = false, features = [
-  "wayland-data-control",
-] }
+arboard = { version = "=3.4.1", default-features = false, features = ["wayland-data-control"] }
 async-trait = "=0.1.83"
 base64 = "=0.22.1"
 better-panic = "=0.3.0"
@@ -45,15 +43,10 @@ chrono = { version = "=0.4.39", default-features = false, features = ["clock"] }
 clap = { version = "=4.5.23", features = ["env", "string"] }
 clap_complete = "=4.5.40"
 clap_mangen = { version = "=0.2.24" }
-crossterm = { version = "=0.28.1", features = [
-  "bracketed-paste",
-  "event-stream",
-] }
+crossterm = { version = "=0.28.1", features = ["bracketed-paste", "event-stream"] }
 dashmap = "=6.1.0"
 dhat = { version = "=0.3.3", optional = true }
-dialoguer = { version = "=0.11.0", default-features = false, features = [
-  "editor",
-] }
+dialoguer = { version = "=0.11.0", default-features = false, features = ["editor"] }
 dirs = "=5.0.1"
 dirs-sys = "=0.4.1" # Pinned sub dependency to avoid poor choices in later versions.
 futures = "=0.3.31"
@@ -65,7 +58,7 @@ reqwest = { version = "=0.12.11", default-features = false, features = [
   "stream",
   "json",
   "gzip",
-  "rustls-tls-native-roots",
+  "rustls-tls-native-roots"
 ] }
 serde = { version = "=1.0.217", features = ["derive"] }
 serde_json = "=1.0.134"
@@ -74,29 +67,15 @@ strum = { version = "=0.26.3", features = ["derive"] }
 syntect = { version = "=5.2.0", default-features = false, features = [
   "parsing",
   "plist-load",
-  "regex-onig",
+  "regex-onig"
 ] }
-tokio = { version = "=1.42.0", features = [
-  "fs",
-  "macros",
-  "rt-multi-thread",
-  "sync",
-  "process",
-] }
+tokio = { version = "=1.42.0", features = ["fs", "macros", "rt-multi-thread", "sync", "process"] }
 tokio-util = "=0.7.13"
 toml_edit = "=0.22.22"
-tracing = { version = "=0.1.41", default-features = false, features = [
-  "std",
-  "log",
-] }
+tracing = { version = "=0.1.41", default-features = false, features = ["std", "log"] }
 tracing-appender = "=0.2.3"
-tracing-subscriber = { version = "=0.3.19", default-features = false, features = [
-  "json",
-] }
-tui-textarea = { version = "=0.7.0", default-features = false, features = [
-  "crossterm",
-  "ratatui",
-] }
+tracing-subscriber = { version = "=0.3.19", default-features = false, features = ["json"] }
+tui-textarea = { version = "=0.7.0", default-features = false, features = ["crossterm", "ratatui"] }
 uuid = { version = "=1.11.0", features = ["v4"] }
 yansi = "=1.0.1"
 
@@ -105,9 +84,7 @@ yansi = "=1.0.1"
 errno = "=0.3.10"
 
 [dev-dependencies]
-cargo-husky = { version = "=1.5.0", default-features = false, features = [
-  "user-hooks",
-] }
+cargo-husky = { version = "=1.5.0", default-features = false, features = ["user-hooks"] }
 insta = { version = "=1.41.1", features = ["toml", "yaml"] }
 mockito = "=1.6.1"
 tempfile = "=3.14.0"
@@ -120,7 +97,7 @@ flate2 = "=1.0.35"
 glob-match = "=0.2.1"
 reqwest = { version = "=0.12.11", default-features = false, features = [
   "blocking",
-  "rustls-tls-native-roots",
+  "rustls-tls-native-roots"
 ] }
 serde = { version = "=1.0.217", features = ["derive"] }
 syntect = { version = "=5.2.0", default-features = false, features = [
@@ -128,7 +105,7 @@ syntect = { version = "=5.2.0", default-features = false, features = [
   "default-syntaxes",
   "plist-load",
   "yaml-load",
-  "regex-onig",
+  "regex-onig"
 ] }
 tar = "=0.4.43"
 toml = "=0.8.19"
