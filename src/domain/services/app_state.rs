@@ -165,9 +165,7 @@ impl<'a> AppState<'a> {
             self.editor_context = Some(editor_context);
             self.messages.push(Message::new(
                 Author::Model,
-                &format!(
-                    "Hey there! Let's talk about the following: \n\n{formatted}"
-                ),
+                &format!("Hey there! Let's talk about the following: \n\n{formatted}"),
             ));
 
             return Ok(());
@@ -228,9 +226,7 @@ impl<'a> AppState<'a> {
                     self.add_message(Message::new_with_type(
                         Author::Oatmeal,
                         MessageType::Error,
-                        &format!(
-                            "There was an error trying to parse your command:\n\n{err:?}"
-                        ),
+                        &format!("There was an error trying to parse your command:\n\n{err:?}"),
                     ));
 
                     return Ok((should_break, should_continue));
