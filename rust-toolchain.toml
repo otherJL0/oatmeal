@@ -1,3 +1,9 @@
 [toolchain]
-channel = "1.74.0"
-components = ["rustfmt", "clippy", "llvm-tools-preview"]
+channel = "nightly"
+components = [
+  "rustfmt",
+  "clippy",
+  "llvm-tools-preview",
+  "rust-analyzer",
+  "rustc-codegen-cranelift-preview"
+]

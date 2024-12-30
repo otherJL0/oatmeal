@@ -5,15 +5,15 @@ mod tests;
 use anyhow::Result;
 use async_trait::async_trait;
 use strum::EnumIter;
-use strum::EnumVariantNames;
 use strum::IntoEnumIterator;
+use strum::VariantNames;
 use tokio::sync::mpsc;
 
 use super::Author;
 use super::EditorContext;
 use super::Event;
 
-#[derive(Clone, Debug, PartialEq, Eq, EnumIter, EnumVariantNames, strum::Display)]
+#[derive(Clone, Debug, PartialEq, Eq, EnumIter, VariantNames, strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum BackendName {
     LangChain,
@@ -56,7 +56,7 @@ impl BackendPrompt {
                 self.text += &code_prompt;
             }
         } else {
-            self.text += ". Add language to any code blocks."
+            self.text += ". Add language to any code blocks.";
         }
     }
 }

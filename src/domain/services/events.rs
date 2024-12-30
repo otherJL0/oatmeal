@@ -129,7 +129,7 @@ impl EventsService {
                     Some(Err(_)) => None,
                     None => None
                 },
-                _ = time::sleep(time::Duration::from_millis(500)) => Some(Event::UITick())
+                () = time::sleep(time::Duration::from_millis(500)) => Some(Event::UITick())
             };
 
             if let Some(event) = evt {

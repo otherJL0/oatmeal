@@ -38,11 +38,12 @@ fn to_res(action: Option<Event>) -> Result<BackendResponse> {
 #[tokio::test]
 async fn it_successfully_health_checks() {
     Config::set(ConfigKey::Model, "model-1");
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/v1beta/model-1?key=abc")
         .with_status(200)
-        .create();
+        .create_async()
+        .await;
 
     let backend = Gemini::with_url(server.url());
     let res = backend.health_check().await;
@@ -74,11 +75,12 @@ async fn it_successfully_health_checks_with_official_api() {
 #[tokio::test]
 async fn it_fails_health_checks() {
     Config::set(ConfigKey::Model, "model-1");
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/v1beta/model-1?key=abc")
         .with_status(500)
-        .create();
+        .create_async()
+        .await;
 
     let backend = Gemini::with_url(server.url());
     let res = backend.health_check().await;
@@ -102,12 +104,13 @@ async fn it_lists_models() -> Result<()> {
         ],
     })?;
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/v1beta/models?key=abc")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let backend = Gemini::with_url(server.url());
     let res = backend.list_models().await?;
@@ -156,12 +159,13 @@ async fn it_gets_completions() -> Result<()> {
         }])?,
     };
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("POST", "/v1beta/model-1:streamGenerateContent?key=abc")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let (tx, mut rx) = mpsc::unbounded_channel::<Event>();
 

@@ -64,7 +64,7 @@ impl<'a> AppState<'a> {
         let theme = Themes::get(&props.theme_name, &props.theme_file)?;
 
         let mut app_state = AppState {
-            backend_context: "".to_string(),
+            backend_context: String::new(),
             bubble_list: BubbleList::new(theme),
             codeblocks: CodeBlocks::default(),
             editor_context: None,
@@ -165,10 +165,7 @@ impl<'a> AppState<'a> {
             self.editor_context = Some(editor_context);
             self.messages.push(Message::new(
                 Author::Model,
-                &format!(
-                    "Hey there! Let's talk about the following: \n\n{}",
-                    formatted
-                ),
+                &format!("Hey there! Let's talk about the following: \n\n{formatted}"),
             ));
 
             return Ok(());
@@ -229,10 +226,7 @@ impl<'a> AppState<'a> {
                     self.add_message(Message::new_with_type(
                         Author::Oatmeal,
                         MessageType::Error,
-                        &format!(
-                            "There was an error trying to parse your command:\n\n{:?}",
-                            err
-                        ),
+                        &format!("There was an error trying to parse your command:\n\n{err:?}"),
                     ));
 
                     return Ok((should_break, should_continue));
@@ -268,7 +262,7 @@ impl<'a> AppState<'a> {
 
             // Reset backend context on model switch.
             if command.is_model_set() {
-                self.backend_context = "".to_string();
+                self.backend_context = String::new();
             }
         }
 

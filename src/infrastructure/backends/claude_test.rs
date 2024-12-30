@@ -40,12 +40,13 @@ async fn it_successfully_health_checks() {
     })
     .unwrap();
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/healthcheck")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let backend = Claude::with_url(server.url());
     let res = backend.health_check().await;
@@ -64,8 +65,12 @@ async fn it_successfully_health_checks_with_official_api() {
 
 #[tokio::test]
 async fn it_fails_health_checks() {
-    let mut server = mockito::Server::new();
-    let mock = server.mock("GET", "/healthcheck").with_status(500).create();
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock("GET", "/healthcheck")
+        .with_status(500)
+        .create_async()
+        .await;
 
     let backend = Claude::with_url(server.url());
     let res = backend.health_check().await;
@@ -118,7 +123,7 @@ async fn it_gets_completions() -> Result<()> {
         }])?,
     };
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("POST", "/v1/messages")
         .match_header("x-api-key", "abc")
@@ -127,7 +132,8 @@ async fn it_gets_completions() -> Result<()> {
         .match_header("anthropic-beta", "messages-2023-12-15")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let (tx, mut rx) = mpsc::unbounded_channel::<Event>();
 

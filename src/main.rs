@@ -32,7 +32,7 @@ static ALLOC: dhat::Alloc = dhat::Alloc;
 fn handle_error(err: Error) {
     eprintln!(
             "{}",
-            Paint::red(format!(
+            Paint::red(&format!(
                 "Oh no! Oatmeal has failed with the following app version and error.\n\nVersion: {}\nCommit: {}\nError: {}",
                 env!("CARGO_PKG_VERSION"),
                 env!("VERGEN_GIT_DESCRIBE"),
@@ -53,7 +53,7 @@ fn handle_error(err: Error) {
         eprintln!("\nOtherwise, running the following can help explain further what the issue is:");
         eprintln!("\nRUST_BACKTRACE=1 {args}");
     } else {
-        eprintln!("\n{}", backtrace);
+        eprintln!("\n{backtrace}");
     }
 
     process::exit(1);
@@ -80,7 +80,7 @@ async fn main() {
     let file_appender = tracing_appender::rolling::never(debug_log_dir, "debug.log");
     let (writer, _guard) = tracing_appender::non_blocking(file_appender);
     if env::var("RUST_LOG")
-        .unwrap_or_else(|_| return "".to_string())
+        .unwrap_or_else(|_| return String::new())
         .contains("oatmeal")
     {
         tracing_subscriber::fmt()
@@ -114,7 +114,7 @@ async fn main() {
     });
 
     if let Err(clipboard_err) = ClipboardService::healthcheck() {
-        tracing::warn!(err = ?clipboard_err, "Clipboard service is unable to start")
+        tracing::warn!(err = ?clipboard_err, "Clipboard service is unable to start");
     } else {
         background_futures.spawn(async move {
             return ClipboardService::start().await;

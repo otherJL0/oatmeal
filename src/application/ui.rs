@@ -52,7 +52,7 @@ fn is_line_width_sufficient(line_width: u16) -> bool {
     let min_width =
         (author_lengths + bubble_style.bubble_padding + bubble_style.border_elements_length) as i32;
     let trimmed_line_width =
-        ((line_width as f32 * (1.0 - bubble_style.outer_padding_percentage)).ceil()) as i32;
+        ((f32::from(line_width) * (1.0 - bubble_style.outer_padding_percentage)).ceil()) as i32;
 
     return trimmed_line_width >= min_width;
 }
@@ -76,10 +76,10 @@ async fn start_loop<B: Backend>(
 
     loop {
         terminal.draw(|frame| {
-            if !is_line_width_sufficient(frame.size().width) {
+            if !is_line_width_sufficient(frame.area().width) {
                 frame.render_widget(
                     Paragraph::new("I'm too small, make me bigger!").alignment(Alignment::Left),
-                    frame.size(),
+                    frame.area(),
                 );
                 return;
             }
@@ -88,7 +88,7 @@ async fn start_loop<B: Backend>(
             let layout = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints(vec![Constraint::Min(1), Constraint::Max(textarea_len)])
-                .split(frame.size());
+                .split(frame.area());
 
             if layout[0].width as usize != app_state.last_known_width
                 || layout[0].height as usize != app_state.last_known_height
@@ -104,7 +104,7 @@ async fn start_loop<B: Backend>(
 
             frame.render_stateful_widget(
                 Scrollbar::new(ScrollbarOrientation::VerticalRight),
-                layout[0].inner(&Margin {
+                layout[0].inner(Margin {
                     vertical: 1,
                     horizontal: 0,
                 }),
@@ -114,7 +114,9 @@ async fn start_loop<B: Backend>(
             if app_state.waiting_for_backend {
                 loading.render(frame, layout[1]);
             } else {
-                frame.render_widget(textarea.widget(), layout[1]);
+                // Frame::render_widget(&textarea,);
+                frame.render_widget(&textarea, layout[1]);
+                // frame.render_widget(textarea.widget(), layout[1]);
             }
         })?;
 

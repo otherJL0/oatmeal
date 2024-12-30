@@ -32,8 +32,12 @@ fn to_res(action: Option<Event>) -> Result<BackendResponse> {
 
 #[tokio::test]
 async fn it_successfully_health_checks() {
-    let mut server = mockito::Server::new();
-    let mock = server.mock("GET", "/").with_status(200).create();
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock("GET", "/")
+        .with_status(200)
+        .create_async()
+        .await;
 
     let backend = Ollama::with_url(server.url());
     let res = backend.health_check().await;
@@ -44,8 +48,12 @@ async fn it_successfully_health_checks() {
 
 #[tokio::test]
 async fn it_fails_health_checks() {
-    let mut server = mockito::Server::new();
-    let mock = server.mock("GET", "/").with_status(500).create();
+    let mut server = mockito::Server::new_async().await;
+    let mock = server
+        .mock("GET", "/")
+        .with_status(500)
+        .create_async()
+        .await;
 
     let backend = Ollama::with_url(server.url());
     let res = backend.health_check().await;
@@ -67,12 +75,13 @@ async fn it_lists_models() -> Result<()> {
         ],
     })?;
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("GET", "/api/tags")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let backend = Ollama::with_url(server.url());
     let res = backend.list_models().await?;
@@ -103,12 +112,13 @@ async fn it_gets_completions() -> Result<()> {
         backend_context: serde_json::to_string(&vec![1])?,
     };
 
-    let mut server = mockito::Server::new();
+    let mut server = mockito::Server::new_async().await;
     let mock = server
         .mock("POST", "/api/generate")
         .with_status(200)
         .with_body(body)
-        .create();
+        .create_async()
+        .await;
 
     let (tx, mut rx) = mpsc::unbounded_channel::<Event>();
 

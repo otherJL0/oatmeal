@@ -87,8 +87,8 @@ impl<'a> BubbleList<'a> {
     }
 
     pub fn render(&self, rect: Rect, buf: &mut Buffer, scroll_index: u16) {
-        let mut cache_keys: Vec<usize> = self.cache.keys().cloned().collect();
-        cache_keys.sort();
+        let mut cache_keys: Vec<usize> = self.cache.keys().copied().collect();
+        cache_keys.sort_unstable();
 
         let mut line_idx = 0;
         let mut should_break = false;

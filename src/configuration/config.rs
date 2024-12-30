@@ -12,8 +12,8 @@ use clap::Command;
 use dashmap::DashMap;
 use once_cell::sync::Lazy;
 use strum::EnumIter;
-use strum::EnumVariantNames;
 use strum::IntoEnumIterator;
+use strum::VariantNames;
 use tokio::fs;
 
 use crate::domain::models::BackendName;
@@ -21,7 +21,7 @@ use crate::domain::models::EditorName;
 
 static CONFIG: Lazy<DashMap<String, String>> = Lazy::new(DashMap::new);
 
-#[derive(Clone, Copy, Eq, PartialEq, EnumIter, EnumVariantNames, strum::Display)]
+#[derive(Clone, Copy, Eq, PartialEq, EnumIter, VariantNames, strum::Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum ConfigKey {
     Backend,
@@ -49,7 +49,7 @@ impl Config {
             return val.to_string();
         }
 
-        return "".to_string();
+        return String::new();
     }
 
     pub fn set(key: ConfigKey, value: &str) {
@@ -58,7 +58,7 @@ impl Config {
 
     pub fn default(key: ConfigKey) -> String {
         if key == ConfigKey::Username {
-            let mut user = env::var("USER").unwrap_or_else(|_| return "".to_string());
+            let mut user = env::var("USER").unwrap_or_else(|_| return String::new());
             if user.is_empty() {
                 user = "User".to_string();
             }
@@ -117,7 +117,7 @@ impl Config {
 
     pub async fn load(cmd: Command, clap_arg_matches: Vec<&ArgMatches>) -> Result<()> {
         for key in ConfigKey::iter() {
-            Config::set(key, &Config::default(key))
+            Config::set(key, &Config::default(key));
         }
 
         let mut config_file = Config::default(ConfigKey::ConfigFile);
@@ -132,7 +132,7 @@ impl Config {
         let config_path = path::PathBuf::from(config_file);
         if config_path.exists() {
             let toml_str = fs::read_to_string(config_path).await?;
-            let doc = toml_str.parse::<toml_edit::Document>()?;
+            let doc = toml_str.parse::<toml_edit::DocumentMut>()?;
 
             for key in ConfigKey::iter() {
                 if let Some(val) = doc.get(&key.to_string()) {
@@ -174,7 +174,7 @@ impl Config {
                     if val.is_empty() {
                         continue;
                     }
-                    Config::set(key, val)
+                    Config::set(key, val);
                 }
             }
         }
@@ -227,7 +227,7 @@ impl Config {
                         .map(|e| return e.get_name())
                         .collect::<Vec<_>>()
                         .join(", ");
-                    description = format!("{description} [possible values: {}]", possible_values);
+                    description = format!("{description} [possible values: {possible_values}]");
                 }
 
                 let mut val = Config::default(key);

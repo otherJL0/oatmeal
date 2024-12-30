@@ -46,7 +46,7 @@ fn repeat_from_subtractions(text: &str, subtractions: Vec<usize>) -> String {
         .unwrap();
 
     if count <= 0 {
-        return "".to_string();
+        return String::new();
     }
 
     return [text].repeat(count.try_into().unwrap()).join("");
@@ -58,7 +58,7 @@ impl<'a> Bubble<'_> {
         alignment: BubbleAlignment,
         window_max_width: usize,
         codeblock_counter: usize,
-    ) -> Bubble {
+    ) -> Bubble<'a> {
         return Bubble {
             alignment,
             message,
@@ -121,7 +121,7 @@ impl<'a> Bubble<'_> {
                     .enumerate()
                     .map(|(idx, segment)| {
                         let (style, content) = segment;
-                        let mut text = content.to_string();
+                        let mut text = (*content).to_string();
                         if idx == highlighted.len() - 1 {
                             text = text.trim_end().to_string();
                         }
