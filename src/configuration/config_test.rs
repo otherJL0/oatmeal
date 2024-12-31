@@ -1,11 +1,20 @@
+use std::env;
+
 use anyhow::Result;
 use test_utils::insta_snapshot;
 
 use super::Config;
 use crate::application::cli;
 
+fn teardown_default_api_keys() {
+    env::remove_var("ANTHROPIC_API_KEY");
+    env::remove_var("OPENAI_API_KEY");
+    env::remove_var("GEMINI_API_KEY");
+}
+
 #[test]
 fn it_serializes_to_valid_toml() {
+    teardown_default_api_keys();
     let res = Config::serialize_default(cli::build());
     let toml_res = res.parse::<toml_edit::DocumentMut>();
     assert!(toml_res.is_ok());
