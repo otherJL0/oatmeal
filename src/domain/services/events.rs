@@ -1,6 +1,7 @@
 use anyhow::Result;
 use crossterm::event::Event as CrosstermEvent;
 use crossterm::event::EventStream;
+use crossterm::event::MouseButton;
 use crossterm::event::MouseEventKind;
 use futures::StreamExt;
 use tokio::sync::mpsc;
@@ -13,6 +14,7 @@ use crate::domain::models::Event;
 pub struct EventsService {
     crossterm_events: EventStream,
     events: mpsc::UnboundedReceiver<Event>,
+    selection_start: Option<u16>,
 }
 
 impl EventsService {
@@ -20,10 +22,11 @@ impl EventsService {
         return EventsService {
             crossterm_events: EventStream::new(),
             events,
+            selection_start: None,
         };
     }
 
-    fn handle_crossterm(&self, event: CrosstermEvent) -> Option<Event> {
+    fn handle_crossterm(&mut self, event: CrosstermEvent) -> Option<Event> {
         match event {
             CrosstermEvent::Paste(text) => {
                 return Some(Event::KeyboardPaste(text));
@@ -36,9 +39,18 @@ impl EventsService {
                     MouseEventKind::ScrollDown => {
                         return Some(Event::UIScrollDown());
                     }
-                    _ => {
+                    MouseEventKind::Down(MouseButton::Left) => {
+                        self.selection_start = Some(mouseevent.row);
                         return None;
                     }
+                    MouseEventKind::Up(MouseButton::Left) => {
+                        assert!(self.selection_start.is_some());
+                        let selection =
+                            Event::Select((self.selection_start.unwrap(), mouseevent.row));
+                        self.selection_start = None;
+                        return Some(selection);
+                    }
+                    _ => return None,
                 }
             }
             CrosstermEvent::Key(keyevent) => {

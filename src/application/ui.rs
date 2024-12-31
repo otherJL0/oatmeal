@@ -21,6 +21,7 @@ use tokio::sync::mpsc;
 
 use crate::configuration::Config;
 use crate::configuration::ConfigKey;
+use crate::domain::models::AcceptType;
 use crate::domain::models::Action;
 use crate::domain::models::Author;
 use crate::domain::models::BackendName;
@@ -38,6 +39,17 @@ use crate::domain::services::Sessions;
 use crate::domain::services::events::EventsService;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
+
+fn trim_line(line: String) -> Option<String> {
+    if line.trim().ends_with("─╮") || line.trim().ends_with("─╯") {
+        return None;
+    }
+    return Some(
+        line.trim_start_matches("│ ")
+            .trim_end_matches(|c: char| return c.is_whitespace() || c == '│')
+            .to_string(),
+    );
+}
 
 /// Verifies that the current window size is large enough to handle the bare
 /// minimum width that includes the model name, username, bubbles, and padding.
@@ -74,7 +86,7 @@ async fn start_loop<B: Backend>(
         textarea.insert_str(test_str);
     }
 
-    loop {
+    'outer: loop {
         terminal.draw(|frame| {
             if !is_line_width_sufficient(frame.area().width) {
                 frame.render_widget(
@@ -241,6 +253,30 @@ async fn start_loop<B: Backend>(
             }
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
+            }
+            Event::Select((x, y)) => {
+                app_state.exit_warning = false;
+                let position = app_state.scroll.position;
+                let start = position + x.min(y) as usize;
+                let end = position + x.max(y) as usize;
+                let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
+                for line_idx in start..=end {
+                    if let Some(selected) = app_state.bubble_list.get_line(line_idx) {
+                        if let Some(selected_line) = trim_line(selected.to_string()) {
+                            lines.push(selected_line);
+                        }
+                    } else {
+                        if lines.is_empty() {
+                            continue 'outer;
+                        }
+                        break;
+                    }
+                }
+                tx.send(Action::AcceptCodeBlock(
+                    app_state.editor_context.clone(),
+                    lines.join("\n"),
+                    AcceptType::Replace,
+                ))?;
             }
         }
     }
