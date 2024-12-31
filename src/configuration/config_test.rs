@@ -1,5 +1,6 @@
-use anyhow::Result;
 use std::env;
+
+use anyhow::Result;
 use test_utils::insta_snapshot;
 
 use super::Config;
