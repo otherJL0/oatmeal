@@ -264,6 +264,7 @@ async fn start_loop<B: Backend>(
                 if start >= bottom_edge {
                     continue 'outer;
                 }
+                app_state.bubble_list.clear_selection();
                 app_state.bubble_list.update_selected_lines(start, end);
             }
             Event::Select((x, y)) => {
