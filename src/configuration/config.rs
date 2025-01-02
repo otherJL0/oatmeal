@@ -69,28 +69,29 @@ impl Config {
         let default_backend = BackendName::Ollama.to_string();
         let default_editor = EditorName::Clipboard.to_string();
 
-        let mut config_path = dirs::cache_dir().unwrap().join("oatmeal/config.toml");
-
-        #[cfg(target_os = "macos")]
-        {
-            config_path =
-                path::PathBuf::from(env::var("HOME").unwrap()).join(".config/oatmeal/config.toml");
-        }
-
-        #[cfg(target_os = "windows")]
-        {
-            config_path = dirs::cache_dir().unwrap().join("oatmeal/config.toml");
-        }
-
-        #[cfg(target_os = "linux")]
-        {
-            config_path = dirs::cache_dir().unwrap().join("oatmeal/config.toml");
-            if !config_path.exists() {
-                config_path = dirs::config_local_dir()
-                    .unwrap()
-                    .join("oatmeal/config.toml");
+        let config_path = {
+            #[cfg(target_os = "macos")]
+            {
+                path::PathBuf::from(env::var("HOME").unwrap()).join(".config/oatmeal/config.toml")
             }
-        }
+
+            #[cfg(target_os = "windows")]
+            {
+                dirs::cache_dir().unwrap().join("oatmeal/config.toml")
+            }
+
+            #[cfg(target_os = "linux")]
+            {
+                let config_path = dirs::cache_dir().unwrap().join("oatmeal/config.toml");
+                if !config_path.exists() {
+                    dirs::config_local_dir()
+                        .unwrap()
+                        .join("oatmeal/config.toml")
+                } else {
+                    config_path
+                }
+            }
+        };
 
         let anthropic_api_key = env::var("ANTHROPIC_API_KEY").unwrap_or_default();
         let openai_api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
