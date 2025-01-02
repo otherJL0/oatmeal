@@ -2,19 +2,19 @@ use std::env;
 use std::io;
 use std::path;
 
-use anyhow::bail;
 use anyhow::Result;
-use clap::builder::PossibleValuesParser;
-use clap::value_parser;
+use anyhow::bail;
 use clap::Arg;
 use clap::ArgAction;
 use clap::ArgGroup;
 use clap::Command;
-use clap_complete::generate;
+use clap::builder::PossibleValuesParser;
+use clap::value_parser;
 use clap_complete::Generator;
 use clap_complete::Shell;
-use dialoguer::theme::ColorfulTheme;
+use clap_complete::generate;
 use dialoguer::Select;
+use dialoguer::theme::ColorfulTheme;
 use strum::VariantNames;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
@@ -25,13 +25,13 @@ use crate::configuration::ConfigKey;
 use crate::domain::models::BackendName;
 use crate::domain::models::EditorName;
 use crate::domain::models::Session;
-use crate::domain::services::actions::help_text;
 use crate::domain::services::Sessions;
 use crate::domain::services::Syntaxes;
 use crate::domain::services::Themes;
+use crate::domain::services::actions::help_text;
 
-fn print_completions<G: Generator>(gen: G, cmd: &mut Command) {
-    generate(gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
+fn print_completions<G: Generator>(r#gen: G, cmd: &mut Command) {
+    generate(r#gen, cmd, cmd.get_name().to_string(), &mut io::stdout());
     std::process::exit(0);
 }
 
