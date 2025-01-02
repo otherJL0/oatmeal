@@ -5,7 +5,7 @@ name = "oatmeal"
 version = "0.13.0"
 authors = ["Dustin Blackman"]
 build = "build.rs"
-edition = "2021"
+edition = "2024"
 exclude = [
   "tools",
   "test",
