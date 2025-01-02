@@ -1,3 +1,4 @@
+use ratatui::Frame;
 use ratatui::prelude::Alignment;
 use ratatui::prelude::Rect;
 use ratatui::widgets::Block;
@@ -5,7 +6,6 @@ use ratatui::widgets::BorderType;
 use ratatui::widgets::Borders;
 use ratatui::widgets::Padding;
 use ratatui::widgets::Paragraph;
-use ratatui::Frame;
 
 #[derive(Default)]
 pub struct Loading {}

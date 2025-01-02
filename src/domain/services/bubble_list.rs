@@ -68,14 +68,11 @@ impl<'a> BubbleList<'a> {
                 let codeblocks_count = message.codeblocks().len();
                 total_codeblock_counter += codeblocks_count;
 
-                self.cache.insert(
-                    idx,
-                    BubbleCacheEntry {
-                        codeblocks_count,
-                        text_len: message.text.len(),
-                        lines: bubble_lines,
-                    },
-                );
+                self.cache.insert(idx, BubbleCacheEntry {
+                    codeblocks_count,
+                    text_len: message.text.len(),
+                    lines: bubble_lines,
+                });
 
                 return bubble_line_len;
             })

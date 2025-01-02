@@ -4,12 +4,12 @@
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::io::prelude::*;
 use std::io::Cursor;
+use std::io::prelude::*;
 use std::path::PathBuf;
 
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use flate2::read::GzDecoder;
 use glob_match::glob_match;
 use serde::Deserialize;

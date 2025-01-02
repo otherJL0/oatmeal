@@ -54,7 +54,12 @@ fn it_creates_author_oatmeal_text() -> Result<()> {
 
 #[test]
 fn it_creates_author_oatmeal_text_long() -> Result<()> {
-    let lines_str = create_lines(Author::Oatmeal, BubbleAlignment::Left, 0, "Hi there! This is a really long line that pushes the boundaries of 50 characters across the screen, resulting in a bubble where the line is wrapped to the next line. Cool right?")?;
+    let lines_str = create_lines(
+        Author::Oatmeal,
+        BubbleAlignment::Left,
+        0,
+        "Hi there! This is a really long line that pushes the boundaries of 50 characters across the screen, resulting in a bubble where the line is wrapped to the next line. Cool right?",
+    )?;
     insta::assert_snapshot!(lines_str, @r###"
     ╭Oatmeal──────────────────────────────────────╮
     │ Hi there! This is a really long line that   │

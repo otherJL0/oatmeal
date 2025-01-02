@@ -2,8 +2,8 @@ pub mod clipboard;
 pub mod neovim;
 pub mod noop;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 
 use crate::domain::models::EditorBox;
 use crate::domain::models::EditorName;
