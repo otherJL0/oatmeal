@@ -5,8 +5,8 @@ use ratatui::widgets::Padding;
 
 pub struct TextArea {}
 
-impl<'a> TextArea {
-    pub fn default() -> tui_textarea::TextArea<'a> {
+impl TextArea {
+    pub fn default() -> tui_textarea::TextArea<'static> {
         let mut textarea = tui_textarea::TextArea::default();
         textarea.set_block(
             Block::default()

@@ -1,7 +1,9 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use ratatui::prelude::Buffer;
 use ratatui::prelude::Rect;
+use ratatui::style::Color;
+use ratatui::style::Style;
 use ratatui::text::Line;
 use syntect::highlighting::Theme;
 
@@ -21,16 +23,16 @@ struct BubbleCacheEntry<'a> {
 }
 
 pub struct BubbleList<'a> {
-    cache: HashMap<usize, BubbleCacheEntry<'a>>,
-    line_width: usize,
-    lines_len: usize,
-    theme: Theme,
+    cache: BTreeMap<usize, BubbleCacheEntry<'a>>,
+    pub line_width: usize,
+    pub lines_len: usize,
+    pub theme: Theme,
 }
 
 impl<'a> BubbleList<'a> {
     pub fn new(theme: Theme) -> BubbleList<'a> {
         return BubbleList {
-            cache: HashMap::new(),
+            cache: BTreeMap::new(),
             line_width: 0,
             lines_len: 0,
             theme,
@@ -39,7 +41,6 @@ impl<'a> BubbleList<'a> {
 
     pub fn set_messages(&mut self, messages: &[Message], line_width: usize) {
         if self.line_width != line_width {
-            self.cache.clear();
             self.line_width = line_width;
         }
 
@@ -109,6 +110,52 @@ impl<'a> BubbleList<'a> {
             if should_break {
                 break;
             }
+        }
+    }
+
+    pub fn get_line(&self, line_idx: usize) -> Option<&Line<'a>> {
+        let mut bubble_first_line_idx: usize = 0;
+        for cache_entry in self.cache.values() {
+            let bubble_last_line_idx = bubble_first_line_idx + cache_entry.lines.len() - 1;
+            if line_idx >= bubble_first_line_idx && line_idx <= bubble_last_line_idx {
+                let bubble_line = line_idx - bubble_first_line_idx;
+                return cache_entry.lines.get(bubble_line);
+            }
+            bubble_first_line_idx = bubble_last_line_idx + 1;
+        }
+        return None;
+    }
+
+    pub fn clear_selection(&mut self) {
+        for (_, entry) in self.cache.iter_mut() {
+            for line in entry.lines.iter_mut() {
+                *line = line.clone().style(Style::default());
+            }
+        }
+    }
+
+    pub fn update_selected_lines(&mut self, start_idx: usize, end_idx: usize) {
+        let mut current_line = 0;
+        for (_, entry) in self.cache.iter_mut() {
+            let entry_line_count = entry.lines.len();
+            let entry_end = current_line + entry_line_count;
+
+            // Check if this entry contains any of the selected lines
+            if current_line <= end_idx && entry_end > start_idx {
+                // Calculate which lines in this entry need highlighting
+                let start = start_idx.saturating_sub(current_line);
+                let end = end_idx
+                    .saturating_sub(current_line)
+                    .min(entry_line_count - 1);
+
+                // Update the style for the selected lines
+                for i in start..=end {
+                    if let Some(line) = entry.lines.get_mut(i) {
+                        *line = line.clone().style(Style::default().bg(Color::DarkGray));
+                    }
+                }
+            }
+            current_line = entry_end;
         }
     }
 }
