@@ -4,8 +4,8 @@ mod tests;
 
 use std::time::Duration;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use async_trait::async_trait;
 use futures::stream::TryStreamExt;
 use itertools::Itertools;
@@ -153,12 +153,10 @@ impl Backend for Claude {
             Ok(html) => {
                 let re = Regex::new(r#"['"](claude-.*)['"]"#).unwrap();
                 let mut results: Vec<String> = vec![];
+                let cleaned_regex = Regex::new(r"[^a-zA-Z0-9-\.]").unwrap();
                 for (_, [model]) in re.captures_iter(&html).map(|c| c.extract()) {
                     let m = model.to_string();
-                    let cleaned = Regex::new(r"[^a-zA-Z0-9-\.]")
-                        .unwrap()
-                        .replace_all(&m, "")
-                        .to_string();
+                    let cleaned = cleaned_regex.replace_all(&m, "").to_string();
                     results.push(cleaned);
                 }
                 return Ok(results.into_iter().unique().collect());
