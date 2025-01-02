@@ -9,8 +9,8 @@ use ratatui::text::Span;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::Theme;
 
-use super::Syntaxes;
 use super::SYNTAX_SET;
+use super::Syntaxes;
 use crate::domain::models::Author;
 use crate::domain::models::Message;
 use crate::domain::models::MessageType;
@@ -99,13 +99,10 @@ impl<'a> Bubble<'_> {
                     self.codeblock_counter += 1;
                     spans = vec![
                         Span::from(line.to_owned()),
-                        Span::styled(
-                            format!(" ({})", self.codeblock_counter),
-                            Style {
-                                fg: Some(Color::White),
-                                ..Style::default()
-                            },
-                        ),
+                        Span::styled(format!(" ({})", self.codeblock_counter), Style {
+                            fg: Some(Color::White),
+                            ..Style::default()
+                        }),
                     ];
                 } else {
                     in_codeblock = false;
@@ -126,13 +123,10 @@ impl<'a> Bubble<'_> {
                             text = text.trim_end().to_string();
                         }
 
-                        return Span::styled(
-                            text,
-                            Style {
-                                fg: Syntaxes::translate_colour(style.foreground),
-                                ..Style::default()
-                            },
-                        );
+                        return Span::styled(text, Style {
+                            fg: Syntaxes::translate_colour(style.foreground),
+                            ..Style::default()
+                        });
                     })
                     .collect();
             }
@@ -238,14 +232,11 @@ impl<'a> Bubble<'_> {
         let top_left_border = "╭";
         let mut top_bar = format!("{top_left_border}{inner_bar}╮");
         let bottom_bar = format!("╰{inner_bar}╯");
-        let bar_bubble_padding = repeat_from_subtractions(
-            " ",
-            vec![
-                self.window_max_width,
-                max_line_length,
-                Bubble::style_config().bubble_padding,
-            ],
-        );
+        let bar_bubble_padding = repeat_from_subtractions(" ", vec![
+            self.window_max_width,
+            max_line_length,
+            Bubble::style_config().bubble_padding,
+        ]);
 
         let username = &self.message.author.to_string();
 
@@ -276,21 +267,15 @@ impl<'a> Bubble<'_> {
 
     fn highlight_span(&self, text: String) -> Span<'a> {
         if self.message.message_type() == MessageType::Error {
-            return Span::styled(
-                text,
-                Style {
-                    fg: Some(Color::Red),
-                    ..Style::default()
-                },
-            );
+            return Span::styled(text, Style {
+                fg: Some(Color::Red),
+                ..Style::default()
+            });
         } else if self.message.author == Author::Oatmeal {
-            return Span::styled(
-                text,
-                Style {
-                    fg: Some(Color::Rgb(138, 85, 63)), // Brown
-                    ..Style::default()
-                },
-            );
+            return Span::styled(text, Style {
+                fg: Some(Color::Rgb(138, 85, 63)), // Brown
+                ..Style::default()
+            });
         }
 
         return Span::from(text);

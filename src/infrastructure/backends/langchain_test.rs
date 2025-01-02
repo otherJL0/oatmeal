@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use tokio::sync::mpsc;
 
 use super::CompletionResponse;

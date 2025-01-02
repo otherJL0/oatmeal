@@ -7,9 +7,11 @@ use super::Config;
 use crate::application::cli;
 
 fn teardown_default_api_keys() {
-    env::remove_var("ANTHROPIC_API_KEY");
-    env::remove_var("OPENAI_API_KEY");
-    env::remove_var("GEMINI_API_KEY");
+    unsafe {
+        env::remove_var("ANTHROPIC_API_KEY");
+        env::remove_var("OPENAI_API_KEY");
+        env::remove_var("GEMINI_API_KEY");
+    }
 }
 
 #[test]

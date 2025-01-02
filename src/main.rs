@@ -31,14 +31,14 @@ static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn handle_error(err: Error) {
     eprintln!(
-            "{}",
-            Paint::red(&format!(
-                "Oh no! Oatmeal has failed with the following app version and error.\n\nVersion: {}\nCommit: {}\nError: {}",
-                env!("CARGO_PKG_VERSION"),
-                env!("VERGEN_GIT_DESCRIBE"),
-                err
-            ))
-        );
+        "{}",
+        Paint::red(&format!(
+            "Oh no! Oatmeal has failed with the following app version and error.\n\nVersion: {}\nCommit: {}\nError: {}",
+            env!("CARGO_PKG_VERSION"),
+            env!("VERGEN_GIT_DESCRIBE"),
+            err
+        ))
+    );
 
     let backtrace = err.backtrace();
     if backtrace.to_string() == "disabled backtrace" {

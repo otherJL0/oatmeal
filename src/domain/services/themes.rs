@@ -3,8 +3,8 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::Cursor;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use syntect::highlighting::Theme;
 use syntect::highlighting::ThemeSet;
 

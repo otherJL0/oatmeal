@@ -1,7 +1,7 @@
 use std::path;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use chrono::DateTime;
 use chrono::Local;
 use chrono::SecondsFormat;

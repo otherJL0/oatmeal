@@ -5,8 +5,8 @@ mod tests;
 use std::env;
 use std::path;
 
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use clap::ArgMatches;
 use clap::Command;
 use dashmap::DashMap;
@@ -163,7 +163,10 @@ impl Config {
                         if !possible_values.is_empty()
                             && !possible_values.contains(&val_str.to_string())
                         {
-                            bail!(format!("config.toml has an invalid value for key '{key}': {val_str}\nPossible values are: {}", possible_values.join(", ")));
+                            bail!(format!(
+                                "config.toml has an invalid value for key '{key}': {val_str}\nPossible values are: {}",
+                                possible_values.join(", ")
+                            ));
                         }
                         Config::set(key, val_str);
                     }

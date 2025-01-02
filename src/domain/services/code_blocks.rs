@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 
 use crate::domain::models::Message;
 use crate::domain::models::SlashCommand;

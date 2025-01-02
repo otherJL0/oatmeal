@@ -1,5 +1,5 @@
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 use test_utils::codeblock_fixture;
 use test_utils::insta_snapshot;
 use tokio::sync::mpsc;

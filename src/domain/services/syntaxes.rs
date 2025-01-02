@@ -43,7 +43,7 @@ impl Syntaxes {
     pub fn translate_colour(syntect_color: syntect::highlighting::Color) -> Option<Color> {
         match syntect_color {
             syntect::highlighting::Color { r, g, b, a } if a > 0 => {
-                return Some(Color::Rgb(r, g, b))
+                return Some(Color::Rgb(r, g, b));
             }
             _ => return None,
         }

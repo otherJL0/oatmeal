@@ -3,8 +3,8 @@ pub mod gemini;
 pub mod langchain;
 pub mod ollama;
 pub mod openai;
-use anyhow::bail;
 use anyhow::Result;
+use anyhow::bail;
 
 use crate::domain::models::BackendBox;
 use crate::domain::models::BackendName;

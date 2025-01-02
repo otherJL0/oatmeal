@@ -1,5 +1,5 @@
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use ratatui::prelude::Rect;
 use tokio::sync::mpsc;
 
