@@ -259,6 +259,13 @@ async fn start_loop<B: Backend>(
                 let position = app_state.scroll.position;
                 let start = position + x.min(y) as usize;
                 let end = position + x.max(y) as usize;
+
+                // Clicks in the bottom text box should be ignored
+                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
+                if start >= bottom_edge {
+                    continue 'outer;
+                }
+
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
                     match app_state.bubble_list.get_line(line_idx) {
