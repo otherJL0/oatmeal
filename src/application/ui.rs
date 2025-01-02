@@ -261,15 +261,14 @@ async fn start_loop<B: Backend>(
                 let end = position + x.max(y) as usize;
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
-                    if let Some(selected) = app_state.bubble_list.get_line(line_idx) {
-                        if let Some(selected_line) = trim_line(selected.to_string()) {
-                            lines.push(selected_line);
+                    match app_state.bubble_list.get_line(line_idx) {
+                        Some(line) => {
+                            if let Some(selected_line) = trim_line(line.to_string()) {
+                                lines.push(selected_line);
+                            }
                         }
-                    } else {
-                        if lines.is_empty() {
-                            continue 'outer;
-                        }
-                        break;
+                        None if lines.is_empty() => continue 'outer,
+                        None => break,
                     }
                 }
                 tx.send(Action::AcceptCodeBlock(
