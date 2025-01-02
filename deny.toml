@@ -19,17 +19,11 @@ confidence-threshold = 0.93
 allow = ["Apache-2.0", "MIT", "Unicode-3.0", "Zlib", "ISC", "BSD-3-Clause", "MPL-2.0"]
 exceptions = [
   { allow = [
-    "Unicode-DFS-2016"
-  ], name = "unicode-ident" },
-  { allow = [
     "BSL-1.0"
   ], name = "clipboard-win" },
   { allow = [
     "BSL-1.0"
   ], name = "error-code" },
-  { allow = [
-    "BSL-1.0"
-  ], name = "str-buf" },
   { allow = [
     "MIT",
     "ISC",
