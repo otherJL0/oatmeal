@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 
 use ratatui::prelude::Buffer;
 use ratatui::prelude::Rect;
+use ratatui::style::Color;
+use ratatui::style::Style;
 use ratatui::text::Line;
 use syntect::highlighting::Theme;
 
@@ -39,7 +41,6 @@ impl<'a> BubbleList<'a> {
 
     pub fn set_messages(&mut self, messages: &[Message], line_width: usize) {
         if self.line_width != line_width {
-            self.cache.clear();
             self.line_width = line_width;
         }
 
@@ -123,5 +124,38 @@ impl<'a> BubbleList<'a> {
             bubble_first_line_idx = bubble_last_line_idx + 1;
         }
         return None;
+    }
+
+    pub fn clear_selection(&mut self) {
+        for (_, entry) in self.cache.iter_mut() {
+            for line in entry.lines.iter_mut() {
+                *line = line.clone().style(Style::default());
+            }
+        }
+    }
+
+    pub fn update_selected_lines(&mut self, start_idx: usize, end_idx: usize) {
+        let mut current_line = 0;
+        for (_, entry) in self.cache.iter_mut() {
+            let entry_line_count = entry.lines.len();
+            let entry_end = current_line + entry_line_count;
+
+            // Check if this entry contains any of the selected lines
+            if current_line <= end_idx && entry_end > start_idx {
+                // Calculate which lines in this entry need highlighting
+                let start = start_idx.saturating_sub(current_line);
+                let end = end_idx
+                    .saturating_sub(current_line)
+                    .min(entry_line_count - 1);
+
+                // Update the style for the selected lines
+                for i in start..=end {
+                    if let Some(line) = entry.lines.get_mut(i) {
+                        *line = line.clone().style(Style::default().bg(Color::DarkGray));
+                    }
+                }
+            }
+            current_line = entry_end;
+        }
     }
 }

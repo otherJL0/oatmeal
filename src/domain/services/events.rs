@@ -43,6 +43,12 @@ impl EventsService {
                         self.selection_start = Some(mouseevent.row);
                         return None;
                     }
+                    MouseEventKind::Drag(MouseButton::Left) => {
+                        return Some(Event::Highlight((
+                            self.selection_start.unwrap(),
+                            mouseevent.row,
+                        )));
+                    }
                     MouseEventKind::Up(MouseButton::Left) => {
                         assert!(self.selection_start.is_some());
                         let selection =

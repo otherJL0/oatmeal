@@ -254,6 +254,18 @@ async fn start_loop<B: Backend>(
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
             }
+            Event::Highlight((x, y)) => {
+                let position = app_state.scroll.position;
+                let start = position + x.min(y) as usize;
+                let end = position + x.max(y) as usize;
+
+                // Clicks in the bottom text box should be ignored
+                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
+                if start >= bottom_edge {
+                    continue 'outer;
+                }
+                app_state.bubble_list.update_selected_lines(start, end);
+            }
             Event::Select((x, y)) => {
                 app_state.exit_warning = false;
                 let position = app_state.scroll.position;
@@ -265,6 +277,7 @@ async fn start_loop<B: Backend>(
                 if start >= bottom_edge {
                     continue 'outer;
                 }
+                app_state.bubble_list.clear_selection();
 
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
