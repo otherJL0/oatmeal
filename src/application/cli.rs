@@ -15,6 +15,8 @@ use clap_complete::Shell;
 use clap_complete::generate;
 use dialoguer::Select;
 use dialoguer::theme::ColorfulTheme;
+use inquire;
+use regex::Regex;
 use strum::VariantNames;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
@@ -61,7 +63,7 @@ fn format_session(session: &Session) -> String {
     return res;
 }
 
-async fn print_sessions_list() -> Result<()> {
+async fn select_from_sessions_list() -> Result<Option<String>> {
     let mut sessions = Sessions::default()
         .list()
         .await?
@@ -75,11 +77,17 @@ async fn print_sessions_list() -> Result<()> {
 
     if sessions.is_empty() {
         println!("There are no sessions available. You should start your first one!");
-    } else {
-        println!("{}", sessions.join("\n"));
+        return Ok(None);
     }
-
-    return Ok(());
+    let session = inquire::Select::new("Select from sessions list:", sessions).prompt()?;
+    let session_id = Regex::new(r"\(ID:\s(?<session_id>[a-zA-Z0-9_-]+)\)")
+        .unwrap()
+        .captures(session.as_str())
+        .unwrap()
+        .name("session_id")
+        .unwrap()
+        .as_str();
+    return Ok(Some(session_id.to_string()));
 }
 
 async fn create_config_file() -> Result<()> {
@@ -490,8 +498,12 @@ pub async fn parse() -> Result<bool> {
                     return Ok(false);
                 }
                 Some(("list", _)) => {
-                    print_sessions_list().await?;
-                    return Ok(false);
+                    if let Some(session_id) = select_from_sessions_list().await? {
+                        Config::load(build(), vec![&matches]).await?;
+                        load_config_from_session(session_id.as_str()).await?;
+                    } else {
+                        return Ok(false);
+                    }
                 }
                 Some(("open", open_matches)) => {
                     Config::load(build(), vec![&matches, open_matches]).await?;
