@@ -121,6 +121,7 @@ cargo-deny = { version = "0.16.2", locked = true }
 cargo-gha = { version = "1.0.2", locked = true }
 cargo-insta = { version = "1.41.1", locked = true }
 cargo-llvm-cov = { version = "0.6.14", locked = true }
+cargo-make = { version = "0.37.23", locked = true }
 cargo-nextest = { version = "0.9.84", locked = true }
 cargo-watch = { version = "8.5.3", locked = true }
 cargo-xwin = { version = "0.17.3", locked = true }
@@ -128,8 +129,9 @@ cargo-zigbuild = { version = "0.19.4", locked = true }
 committed = { version = "1.1.1", locked = true }
 flamegraph = { version = "0.6.5", bins = ["cargo-flamegraph"], locked = true }
 git-cliff = { version = "2.7.0", locked = true }
-mise = { version = "2024.11.23", locked = true }
 samply = { version = "0.12.0", locked = true }
+taplo = { version = "0.9.3", locked = true }
+
 
 [profile.release]
 codegen-units = 1
@@ -189,9 +191,6 @@ lint = '''set -e
   cargo +oatmeal-nightly fmt -- --check
   cargo clippy
   cargo deny check licenses -s
-  cargo bin mise install
-  cargo bin mise x -C tools/node -- npm ci
-  cargo bin mise x -C tools/node -- npm run prettier-check
 '''
 
 lint-fix = '''set -e
@@ -199,9 +198,7 @@ lint-fix = '''set -e
   cargo clippy --fix --allow-dirty
   cargo fix --allow-dirty
   cargo +oatmeal-nightly fmt
-  cargo bin mise install
-  cargo bin mise x -C tools/node -- npm ci
-  cargo bin mise x -C tools/node -- npm run prettier-write
+  cargo make fmt-toml
 '''
 
 get-nightly-name = 'echo oatmeal-nightly'
