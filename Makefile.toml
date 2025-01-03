@@ -1,0 +1,8 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+[tasks.fmt-toml]
+env = { "CARGO_MAKE_CRATE_INSTALLATION_LOCKED" = "true" }
+install_crate = { crate_name = "taplo-cli", binary = "taplo", test_arg = "--help" }
+command = "taplo"
+args = ["fmt"]
