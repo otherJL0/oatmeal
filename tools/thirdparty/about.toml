@@ -9,7 +9,7 @@ accepted = [
   "ISC",
   "Unicode-DFS-2016",
   "BSD-3-Clause",
-  "OpenSSL",
+  "OpenSSL"
 ]
 workarounds = ["chrono", "ring", "rustls"]
 
@@ -24,7 +24,7 @@ targets = [
   "x86_64-pc-windows-msvc",
   "aarch64-pc-windows-msvc",
   "x86_64-apple-darwin",
-  "aarch64-apple-darwin",
+  "aarch64-apple-darwin"
 ]
 
 [x11rb.clarify]
