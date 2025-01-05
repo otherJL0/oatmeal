@@ -128,8 +128,8 @@ cargo-zigbuild = { version = "0.19.4", locked = true }
 committed = { version = "1.1.1", locked = true }
 flamegraph = { version = "0.6.5", bins = ["cargo-flamegraph"], locked = true }
 git-cliff = { version = "2.7.0", locked = true }
-mise = { version = "2024.11.23", locked = true }
 samply = { version = "0.12.0", locked = true }
+taplo-cli = { version = "0.9.3", bins = ["taplo"], locked = true }
 
 [profile.release]
 codegen-units = 1
@@ -189,9 +189,7 @@ lint = '''set -e
   cargo +oatmeal-nightly fmt -- --check
   cargo clippy
   cargo deny check licenses -s
-  cargo bin mise install
-  cargo bin mise x -C tools/node -- npm ci
-  cargo bin mise x -C tools/node -- npm run prettier-check
+  taplo fmt --diff
 '''
 
 lint-fix = '''set -e
@@ -199,9 +197,7 @@ lint-fix = '''set -e
   cargo clippy --fix --allow-dirty
   cargo fix --allow-dirty
   cargo +oatmeal-nightly fmt
-  cargo bin mise install
-  cargo bin mise x -C tools/node -- npm ci
-  cargo bin mise x -C tools/node -- npm run prettier-write
+  taplo fmt
 '''
 
 get-nightly-name = 'echo oatmeal-nightly'
