@@ -8,7 +8,7 @@ pub fn insta_snapshot<F: FnOnce()>(f: F) {
 }
 
 pub fn codeblock_fixture() -> &'static str {
-    return r#"
+    r#"
 Here's how to print in Rust.
 
 ```rust
@@ -49,5 +49,5 @@ for i in range(11):
 
 That's it!
 "#
-    .trim();
+    .trim()
 }
