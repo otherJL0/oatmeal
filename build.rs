@@ -16,7 +16,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use syntect::parsing::SyntaxSetBuilder;
 use tar::Archive;
-use vergen::EmitBuilder;
+use vergen_gix::Emitter;
+use vergen_gix::GixBuilder;
 use walkdir::WalkDir;
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -249,11 +250,11 @@ fn get_themes(themes: Vec<Asset>) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    EmitBuilder::builder().all_git().emit()?;
-
     let assets: Assets = toml::from_str(&fs::read_to_string("./assets.toml")?).unwrap();
     get_themes(assets.themes)?;
     get_syntaxes(assets.syntaxes)?;
 
-    return Ok(());
+    return Emitter::default()
+        .add_instructions(&GixBuilder::all_git()?)?
+        .emit();
 }
