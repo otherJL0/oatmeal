@@ -17,6 +17,6 @@ pub enum Event {
     UIScrollUp(),
     UIScrollPageDown(),
     UIScrollPageUp(),
-    Select((u16, u16)),
-    Highlight((u16, u16)),
+    Select((u16, u16), (u16, u16)),
+    Highlight((u16, u16), (u16, u16)),
 }

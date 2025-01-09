@@ -14,7 +14,7 @@ use crate::domain::models::Event;
 pub struct EventsService {
     crossterm_events: EventStream,
     events: mpsc::UnboundedReceiver<Event>,
-    selection_start: Option<u16>,
+    selection_start: Option<(u16, u16)>,
 }
 
 impl EventsService {
@@ -40,21 +40,24 @@ impl EventsService {
                         return Some(Event::UIScrollDown());
                     }
                     MouseEventKind::Down(MouseButton::Left) => {
-                        self.selection_start = Some(mouseevent.row);
+                        self.selection_start = Some((mouseevent.column, mouseevent.row));
                         return None;
                     }
                     MouseEventKind::Drag(MouseButton::Left) => {
-                        return Some(Event::Highlight((
-                            self.selection_start.unwrap(),
-                            mouseevent.row,
-                        )));
+                        return self.selection_start.map(|selection_start| {
+                            return Some(Event::Highlight(
+                                selection_start,
+                                (mouseevent.column, mouseevent.row),
+                            ));
+                        })?;
                     }
                     MouseEventKind::Up(MouseButton::Left) => {
-                        assert!(self.selection_start.is_some());
-                        let selection =
-                            Event::Select((self.selection_start.unwrap(), mouseevent.row));
-                        self.selection_start = None;
-                        return Some(selection);
+                        return self.selection_start.map(|selection_start| {
+                            let selection =
+                                Event::Select(selection_start, (mouseevent.column, mouseevent.row));
+                            self.selection_start = None;
+                            return Some(selection);
+                        })?;
                     }
                     _ => return None,
                 }
