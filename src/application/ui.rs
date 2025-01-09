@@ -270,7 +270,8 @@ async fn start_loop<B: Backend>(
                 let end = position + x.max(y) as usize;
 
                 // Clicks in the bottom text box should be ignored
-                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
+                let bottom_edge =
+                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
                 if start >= bottom_edge {
                     continue 'outer;
                 }
@@ -284,11 +285,21 @@ async fn start_loop<B: Backend>(
                 let end = position + x.max(y) as usize;
 
                 // Clicks in the bottom text box should be ignored
-                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
+                let bottom_edge =
+                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
+                app_state.bubble_list.clear_selection();
+                tracing::debug!(
+                    start_line = x,
+                    end_line = y,
+                    position,
+                    start,
+                    end,
+                    bottom_edge,
+                    start_greater_bottom_edge = start >= bottom_edge,
+                );
                 if start >= bottom_edge {
                     continue 'outer;
                 }
-                app_state.bubble_list.clear_selection();
 
                 let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
                 for line_idx in start..=end {
