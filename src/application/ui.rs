@@ -18,6 +18,7 @@ use ratatui::widgets::Paragraph;
 use ratatui::widgets::Scrollbar;
 use ratatui::widgets::ScrollbarOrientation;
 use tokio::sync::mpsc;
+use tui_textarea::Key;
 
 use crate::configuration::Config;
 use crate::configuration::ConfigKey;
@@ -185,7 +186,16 @@ async fn start_loop<B: Backend>(
                     app_state.exit_warning = false;
                 }
 
-                textarea.input(input);
+                let is_space = matches!(input.key, Key::Char(' '));
+                let should_wrap = is_space && {
+                    let width = terminal.size()?.width as usize;
+                    textarea.lines().last().unwrap().len() + 10 > width
+                };
+                if should_wrap {
+                    textarea.insert_newline();
+                } else {
+                    textarea.input(input);
+                }
             }
             Event::KeyboardCTRLC() => {
                 if app_state.waiting_for_backend {
