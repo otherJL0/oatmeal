@@ -266,41 +266,36 @@ async fn start_loop<B: Backend>(
             }
             Event::Highlight(start_point, end_point) => {
                 let position = app_state.scroll.position;
-                let start = position + start_point.min(end_point).row;
-                let end = position + start_point.max(end_point).row;
+                let start = start_point.min(end_point).shift_row(position);
+                let end = start_point.max(end_point).shift_row(position);
 
                 // Clicks in the bottom text box should be ignored
                 let bottom_edge =
                     position + terminal.size()?.height as usize - textarea.lines().len() - 3;
-                if start >= bottom_edge {
+                if start.row >= bottom_edge {
                     continue 'outer;
                 }
                 app_state.bubble_list.clear_selection();
-                app_state.bubble_list.update_selected_lines(start, end);
+                app_state
+                    .bubble_list
+                    .update_selected_lines(start.row, end.row);
             }
             Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
+                app_state.bubble_list.clear_selection();
                 let position = app_state.scroll.position;
-                let start = position + start_point.min(end_point).row;
-                let end = position + start_point.max(end_point).row;
+                let start = start_point.min(end_point).shift_row(position);
+                let end = start_point.max(end_point).shift_row(position);
 
                 // Clicks in the bottom text box should be ignored
                 let bottom_edge =
                     position + terminal.size()?.height as usize - textarea.lines().len() - 3;
-                app_state.bubble_list.clear_selection();
-                tracing::debug!(
-                    position,
-                    start,
-                    end,
-                    bottom_edge,
-                    start_greater_bottom_edge = start >= bottom_edge,
-                );
-                if start >= bottom_edge {
+                if start.row >= bottom_edge {
                     continue 'outer;
                 }
 
-                let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
-                for line_idx in start..=end {
+                let mut lines: Vec<String> = Vec::with_capacity(end.row - start.row + 1);
+                for line_idx in start.row..=end.row {
                     match app_state.bubble_list.get_line(line_idx) {
                         Some(line) => {
                             if let Some(selected_line) = trim_line(line.to_string()) {

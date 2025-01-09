@@ -11,6 +11,15 @@ pub struct Point {
     pub row: usize,
 }
 
+impl Point {
+    pub fn shift_row(&self, shift: usize) -> Point {
+        return Point {
+            column: self.column,
+            row: self.row + shift,
+        };
+    }
+}
+
 impl Ord for Point {
     fn cmp(&self, other: &Self) -> Ordering {
         return match self.row.cmp(&other.row) {
