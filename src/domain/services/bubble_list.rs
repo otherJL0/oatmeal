@@ -11,6 +11,7 @@ use super::Bubble;
 use super::BubbleAlignment;
 use crate::domain::models::Author;
 use crate::domain::models::Message;
+use crate::domain::models::Point;
 
 #[cfg(test)]
 #[path = "bubble_list_test.rs"]
@@ -134,17 +135,18 @@ impl<'a> BubbleList<'a> {
         }
     }
 
-    pub fn update_selected_lines(&mut self, start_idx: usize, end_idx: usize) {
+    pub fn update_selected_lines(&mut self, start: &Point, end: &Point) {
         let mut current_line = 0;
         for (_, entry) in self.cache.iter_mut() {
             let entry_line_count = entry.lines.len();
             let entry_end = current_line + entry_line_count;
 
             // Check if this entry contains any of the selected lines
-            if current_line <= end_idx && entry_end > start_idx {
+            if current_line <= end.row && entry_end > start.row {
                 // Calculate which lines in this entry need highlighting
-                let start = start_idx.saturating_sub(current_line);
-                let end = end_idx
+                let start = start.row.saturating_sub(current_line);
+                let end = end
+                    .row
                     .saturating_sub(current_line)
                     .min(entry_line_count - 1);
 

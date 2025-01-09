@@ -276,9 +276,7 @@ async fn start_loop<B: Backend>(
                     continue 'outer;
                 }
                 app_state.bubble_list.clear_selection();
-                app_state
-                    .bubble_list
-                    .update_selected_lines(start.row, end.row);
+                app_state.bubble_list.update_selected_lines(&start, &end);
             }
             Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
@@ -295,8 +293,8 @@ async fn start_loop<B: Backend>(
                 }
 
                 let mut lines: Vec<String> = Vec::with_capacity(end.row - start.row + 1);
-                for line_idx in start.row..=end.row {
-                    match app_state.bubble_list.get_line(line_idx) {
+                for row in start.row..=end.row {
+                    match app_state.bubble_list.get_line(row) {
                         Some(line) => {
                             if let Some(selected_line) = trim_line(line.to_string()) {
                                 lines.push(selected_line);
