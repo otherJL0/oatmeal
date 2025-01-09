@@ -1,7 +1,30 @@
+use std::cmp::Ordering;
+
 use tui_textarea::Input;
 
 use super::BackendResponse;
 use super::Message;
+
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct Point {
+    pub column: usize,
+    pub row: usize,
+}
+
+impl Ord for Point {
+    fn cmp(&self, other: &Self) -> Ordering {
+        return match self.row.cmp(&other.row) {
+            Ordering::Equal => self.column.cmp(&other.column),
+            row_cmp => row_cmp,
+        };
+    }
+}
+
+impl PartialOrd for Point {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        return Some(self.cmp(other));
+    }
+}
 
 pub enum Event {
     BackendMessage(Message),
@@ -17,6 +40,6 @@ pub enum Event {
     UIScrollUp(),
     UIScrollPageDown(),
     UIScrollPageUp(),
-    Select((u16, u16), (u16, u16)),
-    Highlight((u16, u16), (u16, u16)),
+    Select(Point, Point),
+    Highlight(Point, Point),
 }

@@ -264,10 +264,10 @@ async fn start_loop<B: Backend>(
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
             }
-            Event::Highlight((_, start_row), (_, end_row)) => {
+            Event::Highlight(start_point, end_point) => {
                 let position = app_state.scroll.position;
-                let start = position + start_row.min(end_row) as usize;
-                let end = position + start_row.max(end_row) as usize;
+                let start = position + start_point.min(end_point).row;
+                let end = position + start_point.max(end_point).row;
 
                 // Clicks in the bottom text box should be ignored
                 let bottom_edge =
@@ -278,11 +278,11 @@ async fn start_loop<B: Backend>(
                 app_state.bubble_list.clear_selection();
                 app_state.bubble_list.update_selected_lines(start, end);
             }
-            Event::Select((_, start_row), (_, end_row)) => {
+            Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
                 let position = app_state.scroll.position;
-                let start = position + start_row.min(end_row) as usize;
-                let end = position + start_row.max(end_row) as usize;
+                let start = position + start_point.min(end_point).row;
+                let end = position + start_point.max(end_point).row;
 
                 // Clicks in the bottom text box should be ignored
                 let bottom_edge =
