@@ -130,7 +130,9 @@ impl<'a> BubbleList<'a> {
     pub fn clear_selection(&mut self) {
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
-                *line = line.clone().style(Style::default());
+                line.spans.iter_mut().for_each(|span| {
+                    span.style = Style::default();
+                })
             }
         }
     }
@@ -144,16 +146,24 @@ impl<'a> BubbleList<'a> {
             // Check if this entry contains any of the selected lines
             if current_line <= end.row && entry_end > start.row {
                 // Calculate which lines in this entry need highlighting
-                let start = start.row.saturating_sub(current_line);
-                let end = end
+                let start_row = start.row.saturating_sub(current_line);
+                let end_row = end
                     .row
                     .saturating_sub(current_line)
                     .min(entry_line_count - 1);
 
-                // Update the style for the selected lines
-                for i in start..=end {
+                // // Update the style for the selected lines
+                for i in start_row..=end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        *line = line.clone().style(Style::default().bg(Color::DarkGray));
+                        line.spans.iter_mut().for_each(|span| {
+                            let trimmed = span.content.trim();
+                            if !(trimmed.is_empty()
+                                || trimmed.starts_with('│')
+                                || trimmed.ends_with('│'))
+                            {
+                                span.style = Style::default().bg(Color::DarkGray);
+                            }
+                        });
                     }
                 }
             }
