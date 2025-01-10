@@ -56,6 +56,14 @@ impl EventsService {
                         })?;
                     }
                     MouseEventKind::Up(MouseButton::Left) => {
+                        let selection_end = Point {
+                            column: mouseevent.column as usize,
+                            row: mouseevent.row as usize,
+                        };
+                        if selection_end == self.selection_start.unwrap() {
+                            self.selection_start = None;
+                            return None;
+                        }
                         return self.selection_start.map(|selection_start| {
                             let selection = Event::Select(selection_start, Point {
                                 column: mouseevent.column as usize,
