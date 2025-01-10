@@ -10,11 +10,12 @@ use tui_textarea::Input;
 use tui_textarea::Key;
 
 use crate::domain::models::Event;
+use crate::domain::models::Point;
 
 pub struct EventsService {
     crossterm_events: EventStream,
     events: mpsc::UnboundedReceiver<Event>,
-    selection_start: Option<u16>,
+    selection_start: Option<Point>,
 }
 
 impl EventsService {
@@ -40,21 +41,29 @@ impl EventsService {
                         return Some(Event::UIScrollDown());
                     }
                     MouseEventKind::Down(MouseButton::Left) => {
-                        self.selection_start = Some(mouseevent.row);
+                        self.selection_start = Some(Point {
+                            column: mouseevent.column as usize,
+                            row: mouseevent.row as usize,
+                        });
                         return None;
                     }
                     MouseEventKind::Drag(MouseButton::Left) => {
-                        return Some(Event::Highlight((
-                            self.selection_start.unwrap(),
-                            mouseevent.row,
-                        )));
+                        return self.selection_start.map(|selection_start| {
+                            return Some(Event::Highlight(selection_start, Point {
+                                column: mouseevent.column as usize,
+                                row: mouseevent.row as usize,
+                            }));
+                        })?;
                     }
                     MouseEventKind::Up(MouseButton::Left) => {
-                        assert!(self.selection_start.is_some());
-                        let selection =
-                            Event::Select((self.selection_start.unwrap(), mouseevent.row));
-                        self.selection_start = None;
-                        return Some(selection);
+                        return self.selection_start.map(|selection_start| {
+                            let selection = Event::Select(selection_start, Point {
+                                column: mouseevent.column as usize,
+                                row: mouseevent.row as usize,
+                            });
+                            self.selection_start = None;
+                            return Some(selection);
+                        })?;
                     }
                     _ => return None,
                 }

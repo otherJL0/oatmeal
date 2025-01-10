@@ -3,7 +3,6 @@ use std::collections::BTreeMap;
 use ratatui::prelude::Buffer;
 use ratatui::prelude::Rect;
 use ratatui::style::Color;
-use ratatui::style::Style;
 use ratatui::text::Line;
 use syntect::highlighting::Theme;
 
@@ -11,6 +10,7 @@ use super::Bubble;
 use super::BubbleAlignment;
 use crate::domain::models::Author;
 use crate::domain::models::Message;
+use crate::domain::models::Point;
 
 #[cfg(test)]
 #[path = "bubble_list_test.rs"]
@@ -113,49 +113,107 @@ impl<'a> BubbleList<'a> {
         }
     }
 
-    pub fn get_line(&self, line_idx: usize) -> Option<&Line<'a>> {
-        let mut bubble_first_line_idx: usize = 0;
-        for cache_entry in self.cache.values() {
-            let bubble_last_line_idx = bubble_first_line_idx + cache_entry.lines.len() - 1;
-            if line_idx >= bubble_first_line_idx && line_idx <= bubble_last_line_idx {
-                let bubble_line = line_idx - bubble_first_line_idx;
-                return cache_entry.lines.get(bubble_line);
-            }
-            bubble_first_line_idx = bubble_last_line_idx + 1;
-        }
-        return None;
-    }
-
     pub fn clear_selection(&mut self) {
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
-                *line = line.clone().style(Style::default());
+                line.spans.iter_mut().for_each(|span| {
+                    span.style = span.style.bg(Color::default());
+                })
             }
         }
     }
 
-    pub fn update_selected_lines(&mut self, start_idx: usize, end_idx: usize) {
+    pub fn highlight_selected_lines(&mut self, start: &Point, end: &Point) {
         let mut current_line = 0;
         for (_, entry) in self.cache.iter_mut() {
             let entry_line_count = entry.lines.len();
             let entry_end = current_line + entry_line_count;
 
             // Check if this entry contains any of the selected lines
-            if current_line <= end_idx && entry_end > start_idx {
+            if current_line <= end.row && entry_end > start.row {
                 // Calculate which lines in this entry need highlighting
-                let start = start_idx.saturating_sub(current_line);
-                let end = end_idx
+                let start_row = start.row.saturating_sub(current_line);
+                let end_row = end
+                    .row
                     .saturating_sub(current_line)
                     .min(entry_line_count - 1);
 
-                // Update the style for the selected lines
-                for i in start..=end {
+                // // Update the style for the selected lines
+                for i in start_row..=end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        *line = line.clone().style(Style::default().bg(Color::DarkGray));
+                        line.spans.iter_mut().for_each(|span| {
+                            let trimmed = span.content.trim();
+                            if !(trimmed.is_empty()
+                                || trimmed.starts_with('│')
+                                || trimmed.ends_with('│'))
+                            {
+                                span.style = span.style.bg(Color::DarkGray);
+                            }
+                        });
                     }
                 }
             }
             current_line = entry_end;
         }
+    }
+
+    pub fn yank_selected_lines(&self, start: &Point, end: &Point) -> String {
+        let mut current_line = 0;
+        let mut selected_lines = Vec::with_capacity(1 + end.row - start.row);
+        for (_, entry) in self.cache.iter() {
+            let entry_line_count = entry.lines.len();
+            let entry_end = current_line + entry_line_count;
+
+            // Check if this entry contains any of the selected lines
+            if current_line <= end.row && entry_end > start.row {
+                // Calculate which lines in this entry need highlighting
+                let start_row = start.row.saturating_sub(current_line);
+                let end_row = end
+                    .row
+                    .saturating_sub(current_line)
+                    .min(entry_line_count - 1);
+
+                for i in start_row..=end_row {
+                    if let Some(line) = entry.lines.get(i) {
+                        let mut line_content = Vec::new();
+                        let mut left_pipe_found: bool = false;
+                        let mut right_pipe_found: bool = false;
+                        for span in line.spans.iter() {
+                            if right_pipe_found {
+                                break;
+                            }
+
+                            if span.content.contains('│') {
+                                if left_pipe_found {
+                                    right_pipe_found = true;
+                                } else {
+                                    left_pipe_found = true;
+                                }
+                                continue;
+                            }
+                            if span.content.contains('╭')
+                                || span.content.contains('╮')
+                                || span.content.contains('╰')
+                                || span.content.contains('╯')
+                                || span.content.contains('─')
+                            {
+                                continue;
+                            }
+
+                            if left_pipe_found {
+                                line_content.push(String::from(span.content.clone()));
+                            }
+                        }
+                        match line_content.concat().trim_end() {
+                            "" => continue,
+                            v => selected_lines.push(v.to_string()),
+                        }
+                    }
+                }
+                return selected_lines.join("\n");
+            }
+            current_line = entry_end;
+        }
+        unreachable!("TODO");
     }
 }

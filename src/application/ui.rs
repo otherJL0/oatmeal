@@ -41,17 +41,6 @@ use crate::domain::services::events::EventsService;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
 
-fn trim_line(line: String) -> Option<String> {
-    if line.trim().ends_with("─╮") || line.trim().ends_with("─╯") {
-        return None;
-    }
-    return Some(
-        line.trim_start_matches("│ ")
-            .trim_end_matches(|c: char| return c.is_whitespace() || c == '│')
-            .to_string(),
-    );
-}
-
 /// Verifies that the current window size is large enough to handle the bare
 /// minimum width that includes the model name, username, bubbles, and padding.
 fn is_line_width_sufficient(line_width: u16) -> bool {
@@ -264,49 +253,40 @@ async fn start_loop<B: Backend>(
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
             }
-            Event::Highlight((x, y)) => {
+            Event::Highlight(start_point, end_point) => {
                 let position = app_state.scroll.position;
-                let start = position + x.min(y) as usize;
-                let end = position + x.max(y) as usize;
+                let start = start_point.min(end_point).shift_row(position);
+                let end = start_point.max(end_point).shift_row(position);
 
                 // Clicks in the bottom text box should be ignored
-                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
-                if start >= bottom_edge {
+                let bottom_edge =
+                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
+                if start.row >= bottom_edge {
                     continue 'outer;
                 }
                 app_state.bubble_list.clear_selection();
-                app_state.bubble_list.update_selected_lines(start, end);
+                app_state.bubble_list.highlight_selected_lines(&start, &end);
             }
-            Event::Select((x, y)) => {
+            Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
                 let position = app_state.scroll.position;
-                let start = position + x.min(y) as usize;
-                let end = position + x.max(y) as usize;
+                let start = start_point.min(end_point).shift_row(position);
+                let end = start_point.max(end_point).shift_row(position);
 
                 // Clicks in the bottom text box should be ignored
-                let bottom_edge = terminal.size()?.height as usize - textarea.lines().len() - 3;
-                if start >= bottom_edge {
+                let bottom_edge =
+                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
+                if start.row >= bottom_edge {
                     continue 'outer;
                 }
-                app_state.bubble_list.clear_selection();
+                let selected_text: String = app_state.bubble_list.yank_selected_lines(&start, &end);
 
-                let mut lines: Vec<String> = Vec::with_capacity(end - start + 1);
-                for line_idx in start..=end {
-                    match app_state.bubble_list.get_line(line_idx) {
-                        Some(line) => {
-                            if let Some(selected_line) = trim_line(line.to_string()) {
-                                lines.push(selected_line);
-                            }
-                        }
-                        None if lines.is_empty() => continue 'outer,
-                        None => break,
-                    }
-                }
                 tx.send(Action::AcceptCodeBlock(
                     app_state.editor_context.clone(),
-                    lines.join("\n"),
+                    selected_text,
                     AcceptType::Replace,
                 ))?;
+                app_state.bubble_list.clear_selection();
             }
         }
     }
