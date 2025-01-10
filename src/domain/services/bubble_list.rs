@@ -175,24 +175,39 @@ impl<'a> BubbleList<'a> {
 
                 for i in start_row..=end_row {
                     if let Some(line) = entry.lines.get(i) {
-                        selected_lines.push(
-                            line.spans
-                                .iter()
-                                .map(|span| {
-                                    return if span.content.contains('│')
-                                        || span.content.clone().trim().is_empty()
-                                        || span.content.contains('╰')
-                                        || span.content.contains('╯')
-                                        || span.content.contains('╭')
-                                        || span.content.contains('╮')
-                                    {
-                                        String::default()
-                                    } else {
-                                        String::from(span.content.clone())
-                                    };
-                                })
-                                .collect::<String>(),
-                        );
+                        let mut line_content = Vec::new();
+                        let mut left_pipe_found: bool = false;
+                        let mut right_pipe_found: bool = false;
+                        for span in line.spans.iter() {
+                            if right_pipe_found {
+                                break;
+                            }
+
+                            if span.content.contains('│') {
+                                if left_pipe_found {
+                                    right_pipe_found = true;
+                                } else {
+                                    left_pipe_found = true;
+                                }
+                                continue;
+                            }
+                            if span.content.contains('╭')
+                                || span.content.contains('╮')
+                                || span.content.contains('╰')
+                                || span.content.contains('╯')
+                                || span.content.contains('─')
+                            {
+                                continue;
+                            }
+
+                            if left_pipe_found {
+                                line_content.push(String::from(span.content.clone()));
+                            }
+                        }
+                        match line_content.concat().trim_end() {
+                            "" => continue,
+                            v => selected_lines.push(v.to_string()),
+                        }
                     }
                 }
                 return selected_lines.join("\n");
