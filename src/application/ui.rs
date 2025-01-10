@@ -41,17 +41,6 @@ use crate::domain::services::events::EventsService;
 use crate::infrastructure::backends::BackendManager;
 use crate::infrastructure::editors::EditorManager;
 
-fn trim_line(line: String) -> Option<String> {
-    if line.trim().ends_with("─╮") || line.trim().ends_with("─╯") {
-        return None;
-    }
-    return Some(
-        line.trim_start_matches("│ ")
-            .trim_end_matches(|c: char| return c.is_whitespace() || c == '│')
-            .to_string(),
-    );
-}
-
 /// Verifies that the current window size is large enough to handle the bare
 /// minimum width that includes the model name, username, bubbles, and padding.
 fn is_line_width_sufficient(line_width: u16) -> bool {
@@ -280,7 +269,6 @@ async fn start_loop<B: Backend>(
             }
             Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
-                app_state.bubble_list.clear_selection();
                 let position = app_state.scroll.position;
                 let start = start_point.min(end_point).shift_row(position);
                 let end = start_point.max(end_point).shift_row(position);
@@ -291,24 +279,14 @@ async fn start_loop<B: Backend>(
                 if start.row >= bottom_edge {
                     continue 'outer;
                 }
+                let selected_text: String = app_state.bubble_list.yank_selected_lines(&start, &end);
 
-                let mut lines: Vec<String> = Vec::with_capacity(end.row - start.row + 1);
-                for row in start.row..=end.row {
-                    match app_state.bubble_list.get_line(row) {
-                        Some(line) => {
-                            if let Some(selected_line) = trim_line(line.to_string()) {
-                                lines.push(selected_line);
-                            }
-                        }
-                        None if lines.is_empty() => continue 'outer,
-                        None => break,
-                    }
-                }
                 tx.send(Action::AcceptCodeBlock(
                     app_state.editor_context.clone(),
-                    lines.join("\n"),
+                    selected_text,
                     AcceptType::Replace,
                 ))?;
+                app_state.bubble_list.clear_selection();
             }
         }
     }
