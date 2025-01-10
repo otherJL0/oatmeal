@@ -123,7 +123,7 @@ impl<'a> BubbleList<'a> {
         }
     }
 
-    pub fn update_selected_lines(&mut self, start: &Point, end: &Point) {
+    pub fn highlight_selected_lines(&mut self, start: &Point, end: &Point) {
         let mut current_line = 0;
         for (_, entry) in self.cache.iter_mut() {
             let entry_line_count = entry.lines.len();
@@ -199,6 +199,6 @@ impl<'a> BubbleList<'a> {
             }
             current_line = entry_end;
         }
-        unreachable!("");
+        unreachable!("TODO");
     }
 }

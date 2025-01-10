@@ -265,7 +265,7 @@ async fn start_loop<B: Backend>(
                     continue 'outer;
                 }
                 app_state.bubble_list.clear_selection();
-                app_state.bubble_list.update_selected_lines(&start, &end);
+                app_state.bubble_list.highlight_selected_lines(&start, &end);
             }
             Event::Select(start_point, end_point) => {
                 app_state.exit_warning = false;
