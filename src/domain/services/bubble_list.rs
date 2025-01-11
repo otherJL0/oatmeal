@@ -141,15 +141,34 @@ impl<'a> BubbleList<'a> {
                 // // Update the style for the selected lines
                 for i in start_row..=end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        line.spans.iter_mut().for_each(|span| {
-                            let trimmed = span.content.trim();
-                            if !(trimmed.is_empty()
-                                || trimmed.starts_with('│')
-                                || trimmed.ends_with('│'))
+                        let mut left_pipe_found: bool = false;
+                        let mut right_pipe_found: bool = false;
+                        for span in line.spans.iter_mut() {
+                            if right_pipe_found {
+                                break;
+                            }
+
+                            if span.content.contains('│') {
+                                if left_pipe_found {
+                                    right_pipe_found = true;
+                                } else {
+                                    left_pipe_found = true;
+                                }
+                                continue;
+                            }
+                            if span.content.contains('╭')
+                                || span.content.contains('╮')
+                                || span.content.contains('╰')
+                                || span.content.contains('╯')
+                                || span.content.contains('─')
                             {
+                                continue;
+                            }
+
+                            if left_pipe_found {
                                 span.style = span.style.bg(Color::DarkGray);
                             }
-                        });
+                        }
                     }
                 }
             }
