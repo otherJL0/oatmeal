@@ -63,7 +63,18 @@ fn format_session(session: &Session) -> String {
     return res;
 }
 
-async fn select_from_sessions_list() -> Result<Option<String>> {
+fn get_session_id(session: &str) -> String {
+    return Regex::new(r"\(ID:\s(?<session_id>[a-zA-Z0-9_-]+)\)")
+        .unwrap()
+        .captures(session)
+        .unwrap()
+        .name("session_id")
+        .unwrap()
+        .as_str()
+        .to_string();
+}
+
+async fn get_sessions_list() -> Result<Vec<String>> {
     let mut sessions = Sessions::default()
         .list()
         .await?
@@ -74,19 +85,18 @@ async fn select_from_sessions_list() -> Result<Option<String>> {
         .collect::<Vec<String>>();
 
     sessions.reverse();
+    return Ok(sessions);
+}
+
+async fn select_from_sessions_list() -> Result<Option<String>> {
+    let sessions = get_sessions_list().await?;
 
     if sessions.is_empty() {
         println!("There are no sessions available. You should start your first one!");
         return Ok(None);
     }
     let session = inquire::Select::new("Select from sessions list:", sessions).prompt()?;
-    let session_id = Regex::new(r"\(ID:\s(?<session_id>[a-zA-Z0-9_-]+)\)")
-        .unwrap()
-        .captures(session.as_str())
-        .unwrap()
-        .name("session_id")
-        .unwrap()
-        .as_str();
+    let session_id = get_session_id(&session);
     return Ok(Some(session_id.to_string()));
 }
 
@@ -231,6 +241,10 @@ fn subcommand_sessions_delete() -> Command {
         );
 }
 
+fn subcommand_sessions_last() -> Command {
+    return Command::new("last").about("Open last used session.");
+}
+
 fn arg_backend() -> Arg {
     return Arg::new(ConfigKey::Backend.to_string())
         .short('b')
@@ -288,7 +302,8 @@ fn subcommand_sessions() -> Command {
                         .required(false),
                 ),
         )
-        .subcommand(subcommand_sessions_delete());
+        .subcommand(subcommand_sessions_delete())
+        .subcommand(subcommand_sessions_last());
 }
 
 pub fn build() -> Command {
@@ -524,6 +539,15 @@ pub async fn parse() -> Result<bool> {
                         subcommand_sessions_delete().print_long_help()?;
                     }
                     return Ok(false);
+                }
+                Some(("last", _)) => {
+                    if let Some(session) = get_sessions_list().await?.first() {
+                        let session_id = get_session_id(session);
+                        Config::load(build(), vec![&matches]).await?;
+                        load_config_from_session(session_id.as_str()).await?;
+                    } else {
+                        return Ok(false);
+                    }
                 }
                 _ => {
                     subcommand_sessions().print_long_help()?;
