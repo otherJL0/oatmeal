@@ -1,3 +1,6 @@
+use std::fs;
+use std::path::PathBuf;
+
 use anyhow::Result;
 use anyhow::anyhow;
 use ratatui::prelude::Rect;
@@ -14,6 +17,7 @@ use crate::domain::models::AcceptType;
 use crate::domain::models::Action;
 use crate::domain::models::Author;
 use crate::domain::models::BackendBox;
+use crate::domain::models::BackendPrompt;
 use crate::domain::models::BackendResponse;
 use crate::domain::models::EditorBox;
 use crate::domain::models::EditorContext;
@@ -263,6 +267,45 @@ impl<'a> AppState<'a> {
             // Reset backend context on model switch.
             if command.is_model_set() {
                 self.backend_context = String::new();
+            }
+
+            if command.is_load_file() {
+                should_continue = true;
+                if command.args.is_empty() {
+                    self.add_message(Message::new_with_type(
+                        Author::Oatmeal,
+                        MessageType::Error,
+                        "You must specify a path. Usage: /file <path>",
+                    ));
+                    return Ok((should_break, should_continue));
+                }
+                let file_path = PathBuf::from(&command.args[0]);
+                match fs::read_to_string(&file_path) {
+                    Ok(content) => {
+                        self.waiting_for_backend = true;
+                        tx.send(Action::BackendRequest(BackendPrompt {
+                            text: format!(
+                                r#"I have loaded the file {}:
+                                ```
+                                {}
+                                ```
+                                Please consider this file for the rest of this session.
+                                You must respond with 'Loaded file {}'."#,
+                                file_path.display(),
+                                content,
+                                file_path.display(),
+                            ),
+                            backend_context: self.backend_context.clone(),
+                        }))?;
+                    }
+                    Err(err) => {
+                        self.add_message(Message::new_with_type(
+                            Author::Oatmeal,
+                            MessageType::Error,
+                            &format!("Failed to read file {}: {}", file_path.display(), err),
+                        ));
+                    }
+                }
             }
         }
 

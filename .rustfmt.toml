@@ -1,4 +1,4 @@
-edition = "2021"
+edition = "2024"
 force_multiline_blocks = true
 group_imports = "StdExternalCrate"
 imports_granularity = "Item"
