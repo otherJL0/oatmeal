@@ -29,6 +29,37 @@ pub struct BubbleList<'a> {
     pub theme: Theme,
 }
 
+fn highlight_start_row(line: &mut Line) {
+    let mut left_pipe_found: bool = false;
+    let mut right_pipe_found: bool = false;
+    for span in line.spans.iter_mut() {
+        if right_pipe_found {
+            break;
+        }
+
+        if span.content.contains('│') {
+            if left_pipe_found {
+                right_pipe_found = true;
+            } else {
+                left_pipe_found = true;
+            }
+            continue;
+        }
+        if span.content.contains('╭')
+            || span.content.contains('╮')
+            || span.content.contains('╰')
+            || span.content.contains('╯')
+            || span.content.contains('─')
+        {
+            continue;
+        }
+
+        if left_pipe_found {
+            span.style = span.style.bg(Color::DarkGray);
+        }
+    }
+}
+
 impl<'a> BubbleList<'a> {
     pub fn new(theme: Theme) -> BubbleList<'a> {
         return BubbleList {
@@ -138,37 +169,10 @@ impl<'a> BubbleList<'a> {
                     .saturating_sub(current_line)
                     .min(entry_line_count - 1);
 
-                // // Update the style for the selected lines
+                // Update the style for the selected lines
                 for i in start_row..=end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        let mut left_pipe_found: bool = false;
-                        let mut right_pipe_found: bool = false;
-                        for span in line.spans.iter_mut() {
-                            if right_pipe_found {
-                                break;
-                            }
-
-                            if span.content.contains('│') {
-                                if left_pipe_found {
-                                    right_pipe_found = true;
-                                } else {
-                                    left_pipe_found = true;
-                                }
-                                continue;
-                            }
-                            if span.content.contains('╭')
-                                || span.content.contains('╮')
-                                || span.content.contains('╰')
-                                || span.content.contains('╯')
-                                || span.content.contains('─')
-                            {
-                                continue;
-                            }
-
-                            if left_pipe_found {
-                                span.style = span.style.bg(Color::DarkGray);
-                            }
-                        }
+                        highlight_start_row(line);
                     }
                 }
             }
