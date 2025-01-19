@@ -1,5 +1,6 @@
 use std::io;
 
+use anyhow::Error;
 use anyhow::Result;
 use crossterm::cursor;
 use crossterm::event::DisableBracketedPaste;
@@ -30,6 +31,7 @@ use crate::domain::models::EditorName;
 use crate::domain::models::Event;
 use crate::domain::models::Loading;
 use crate::domain::models::Message;
+use crate::domain::models::Point;
 use crate::domain::models::SlashCommand;
 use crate::domain::models::TextArea;
 use crate::domain::services::AppState;
@@ -58,6 +60,26 @@ fn is_line_width_sufficient(line_width: u16) -> bool {
     return trimmed_line_width >= min_width;
 }
 
+/// Ensure that the start and end points do not include the input text area
+fn validate_selected_region<B: Backend>(
+    app_state: &AppState,
+    start_point: Point,
+    end_point: Point,
+    terminal: &mut Terminal<B>,
+    textarea: &tui_textarea::TextArea,
+) -> Result<(Point, Point)> {
+    let position = app_state.scroll.position;
+    let start = start_point.min(end_point).shift_row(position);
+    let end = start_point.max(end_point).shift_row(position);
+
+    // Clicks in the bottom text box should be ignored
+    let bottom_edge = position + terminal.size()?.height as usize - textarea.lines().len() - 3;
+    if start.row < bottom_edge {
+        return Ok((start, end));
+    }
+    return Err(Error::msg("None"));
+}
+
 async fn start_loop<B: Backend>(
     terminal: &mut Terminal<B>,
     app_state_props: AppStateProps,
@@ -75,7 +97,7 @@ async fn start_loop<B: Backend>(
         textarea.insert_str(test_str);
     }
 
-    'outer: loop {
+    loop {
         terminal.draw(|frame| {
             if !is_line_width_sufficient(frame.area().width) {
                 frame.render_widget(
@@ -250,40 +272,38 @@ async fn start_loop<B: Backend>(
             Event::UIScrollPageUp() => {
                 app_state.scroll.up_page();
             }
-            Event::Highlight(start_point, end_point) => {
-                let position = app_state.scroll.position;
-                let start = start_point.min(end_point).shift_row(position);
-                let end = start_point.max(end_point).shift_row(position);
-
-                // Clicks in the bottom text box should be ignored
-                let bottom_edge =
-                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
-                if start.row >= bottom_edge {
-                    continue 'outer;
+            Event::Highlight(downclick_point, releaseclick_point) => {
+                if let Ok((start, end)) = validate_selected_region(
+                    &app_state,
+                    downclick_point,
+                    releaseclick_point,
+                    terminal,
+                    &textarea,
+                ) {
+                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.highlight_selected_lines(&start, &end);
                 }
-                app_state.bubble_list.clear_selection();
-                app_state.bubble_list.highlight_selected_lines(&start, &end);
             }
-            Event::Select(start_point, end_point) => {
-                app_state.exit_warning = false;
-                let position = app_state.scroll.position;
-                let start = start_point.min(end_point).shift_row(position);
-                let end = start_point.max(end_point).shift_row(position);
+            Event::Select(downclick_point, releaseclick_point) => {
+                if let Ok((start, end)) = validate_selected_region(
+                    &app_state,
+                    downclick_point,
+                    releaseclick_point,
+                    terminal,
+                    &textarea,
+                ) {
+                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.highlight_selected_lines(&start, &end);
+                    let selected_text: String =
+                        app_state.bubble_list.yank_selected_lines(&start, &end);
 
-                // Clicks in the bottom text box should be ignored
-                let bottom_edge =
-                    position + terminal.size()?.height as usize - textarea.lines().len() - 3;
-                if start.row >= bottom_edge {
-                    continue 'outer;
+                    tx.send(Action::AcceptCodeBlock(
+                        app_state.editor_context.clone(),
+                        selected_text,
+                        AcceptType::Replace,
+                    ))?;
+                    app_state.bubble_list.clear_selection();
                 }
-                let selected_text: String = app_state.bubble_list.yank_selected_lines(&start, &end);
-
-                tx.send(Action::AcceptCodeBlock(
-                    app_state.editor_context.clone(),
-                    selected_text,
-                    AcceptType::Replace,
-                ))?;
-                app_state.bubble_list.clear_selection();
             }
         }
     }
