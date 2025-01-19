@@ -62,7 +62,7 @@ reqwest = { version = "=0.12.12", default-features = false, features = [
   "rustls-tls-native-roots"
 ] }
 serde = { version = "=1.0.217", features = ["derive"] }
-serde_json = "=1.0.135"
+serde_json = "=1.0.136"
 serde_yaml = "=0.9.34"
 strum = { version = "=0.26.3", features = ["derive"] }
 syntect = { version = "=5.2.0", default-features = false, features = [
