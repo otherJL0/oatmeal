@@ -280,7 +280,7 @@ async fn start_loop<B: Backend>(
                     terminal,
                     &textarea,
                 ) {
-                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.reset_highlight();
                     app_state.bubble_list.highlight_selected_lines(&start, &end);
                 }
             }
@@ -292,8 +292,6 @@ async fn start_loop<B: Backend>(
                     terminal,
                     &textarea,
                 ) {
-                    app_state.bubble_list.clear_selection();
-                    app_state.bubble_list.highlight_selected_lines(&start, &end);
                     let selected_text: String =
                         app_state.bubble_list.yank_selected_lines(&start, &end);
 
@@ -302,7 +300,7 @@ async fn start_loop<B: Backend>(
                         selected_text,
                         AcceptType::Replace,
                     ))?;
-                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.reset_highlight();
                 }
             }
         }

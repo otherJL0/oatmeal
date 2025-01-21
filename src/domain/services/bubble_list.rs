@@ -5,6 +5,7 @@ use ratatui::prelude::Rect;
 use ratatui::style::Color;
 use ratatui::text::Line;
 use syntect::highlighting::Theme;
+use unicode_width::UnicodeWidthStr;
 
 use super::Bubble;
 use super::BubbleAlignment;
@@ -27,6 +28,44 @@ pub struct BubbleList<'a> {
     pub line_width: usize,
     pub lines_len: usize,
     pub theme: Theme,
+}
+
+fn highlight_line(line: &mut Line, start_point: Option<Point>, end_point: Option<Point>) {
+    let mut left_pipe_found: bool = false;
+    let mut right_pipe_found: bool = false;
+    let mut current_column: usize = 0;
+    for span in line.spans.iter_mut() {
+        current_column += span.content.width();
+        if right_pipe_found {
+            break;
+        }
+
+        if span.content.contains('│') {
+            if left_pipe_found {
+                right_pipe_found = true;
+            } else {
+                left_pipe_found = true;
+            }
+            continue;
+        }
+        if span.content.contains('╭')
+            || span.content.contains('╮')
+            || span.content.contains('╰')
+            || span.content.contains('╯')
+            || span.content.contains('─')
+        {
+            continue;
+        }
+
+        if left_pipe_found && current_column >= start_point.unwrap_or_default().column {
+            span.style = span.style.bg(Color::DarkGray);
+        }
+        if let Some(end) = end_point
+            && current_column >= end.column
+        {
+            break;
+        }
+    }
 }
 
 impl<'a> BubbleList<'a> {
@@ -113,7 +152,7 @@ impl<'a> BubbleList<'a> {
         }
     }
 
-    pub fn clear_selection(&mut self) {
+    pub fn reset_highlight(&mut self) {
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
                 line.spans.iter_mut().for_each(|span| {
@@ -121,6 +160,31 @@ impl<'a> BubbleList<'a> {
                 })
             }
         }
+    }
+
+    pub fn yank_selected_lines(&mut self, start: &Point, end: &Point) -> String {
+        let mut selected_lines: Vec<String> = Vec::with_capacity(end.row + 1 - start.row);
+        for (_, entry) in self.cache.iter_mut() {
+            for line in entry.lines.iter_mut() {
+                let current_line: Vec<String> = line
+                    .spans
+                    .iter_mut()
+                    .filter_map(|span| {
+                        if let Some(Color::DarkGray) = span.style.bg {
+                            return Some(String::from(span.content.clone()));
+                        } else {
+                            return None;
+                        }
+                    })
+                    .collect();
+                if !current_line.is_empty() {
+                    selected_lines.push(current_line.join(""));
+                } else if !selected_lines.is_empty() {
+                    return selected_lines.join("\n");
+                }
+            }
+        }
+        return String::new();
     }
 
     pub fn highlight_selected_lines(&mut self, start: &Point, end: &Point) {
@@ -138,101 +202,20 @@ impl<'a> BubbleList<'a> {
                     .saturating_sub(current_line)
                     .min(entry_line_count - 1);
 
-                // // Update the style for the selected lines
-                for i in start_row..=end_row {
+                // Update the style for the selected lines
+                if let Some(line) = entry.lines.get_mut(start_row) {
+                    highlight_line(line, Some(*start), None);
+                }
+                for i in start_row + 1..end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        let mut left_pipe_found: bool = false;
-                        let mut right_pipe_found: bool = false;
-                        for span in line.spans.iter_mut() {
-                            if right_pipe_found {
-                                break;
-                            }
-
-                            if span.content.contains('│') {
-                                if left_pipe_found {
-                                    right_pipe_found = true;
-                                } else {
-                                    left_pipe_found = true;
-                                }
-                                continue;
-                            }
-                            if span.content.contains('╭')
-                                || span.content.contains('╮')
-                                || span.content.contains('╰')
-                                || span.content.contains('╯')
-                                || span.content.contains('─')
-                            {
-                                continue;
-                            }
-
-                            if left_pipe_found {
-                                span.style = span.style.bg(Color::DarkGray);
-                            }
-                        }
+                        highlight_line(line, None, None);
                     }
+                }
+                if let Some(line) = entry.lines.get_mut(end_row) {
+                    highlight_line(line, None, Some(*end));
                 }
             }
             current_line = entry_end;
         }
-    }
-
-    pub fn yank_selected_lines(&self, start: &Point, end: &Point) -> String {
-        let mut current_line = 0;
-        let mut selected_lines = Vec::with_capacity(1 + end.row - start.row);
-        for (_, entry) in self.cache.iter() {
-            let entry_line_count = entry.lines.len();
-            let entry_end = current_line + entry_line_count;
-
-            // Check if this entry contains any of the selected lines
-            if current_line <= end.row && entry_end > start.row {
-                // Calculate which lines in this entry need highlighting
-                let start_row = start.row.saturating_sub(current_line);
-                let end_row = end
-                    .row
-                    .saturating_sub(current_line)
-                    .min(entry_line_count - 1);
-
-                for i in start_row..=end_row {
-                    if let Some(line) = entry.lines.get(i) {
-                        let mut line_content = Vec::new();
-                        let mut left_pipe_found: bool = false;
-                        let mut right_pipe_found: bool = false;
-                        for span in line.spans.iter() {
-                            if right_pipe_found {
-                                break;
-                            }
-
-                            if span.content.contains('│') {
-                                if left_pipe_found {
-                                    right_pipe_found = true;
-                                } else {
-                                    left_pipe_found = true;
-                                }
-                                continue;
-                            }
-                            if span.content.contains('╭')
-                                || span.content.contains('╮')
-                                || span.content.contains('╰')
-                                || span.content.contains('╯')
-                                || span.content.contains('─')
-                            {
-                                continue;
-                            }
-
-                            if left_pipe_found {
-                                line_content.push(String::from(span.content.clone()));
-                            }
-                        }
-                        match line_content.concat().trim_end() {
-                            "" => continue,
-                            v => selected_lines.push(v.to_string()),
-                        }
-                    }
-                }
-                return selected_lines.join("\n");
-            }
-            current_line = entry_end;
-        }
-        unreachable!("TODO");
     }
 }
