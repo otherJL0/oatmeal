@@ -152,14 +152,37 @@ impl<'a> BubbleList<'a> {
         }
     }
 
-    pub fn clear_selection(&mut self) {
+    pub fn reset_highlight(&mut self) {
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
                 line.spans.iter_mut().for_each(|span| {
+                    // if let Some(Color::DarkGray) = span.style.bg {
+                    //     tracing::debug!("highlight span: {:?}", span)
+                    // }
                     span.style = span.style.bg(Color::default());
                 })
             }
         }
+    }
+
+    pub fn yank_selected_lines(&mut self) -> String {
+        let mut selected_lines: Vec<String> = Vec::new();
+        for (_, entry) in self.cache.iter_mut() {
+            for line in entry.lines.iter_mut() {
+                let mut current_line = Vec::new();
+                line.spans.iter_mut().for_each(|span| {
+                    if let Some(Color::DarkGray) = span.style.bg {
+                        tracing::debug!("highlight span: {:?}", span);
+                        current_line.push(String::from(span.content.clone()));
+                    }
+                });
+                if !current_line.is_empty() {
+                    tracing::debug!("{:?}", current_line);
+                    selected_lines.push(current_line.join(""));
+                }
+            }
+        }
+        return selected_lines.join("\n");
     }
 
     pub fn highlight_selected_lines(&mut self, start: &Point, end: &Point) {
@@ -192,65 +215,5 @@ impl<'a> BubbleList<'a> {
             }
             current_line = entry_end;
         }
-    }
-
-    pub fn yank_selected_lines(&self, start: &Point, end: &Point) -> String {
-        let mut current_line = 0;
-        let mut selected_lines = Vec::with_capacity(1 + end.row - start.row);
-        for (_, entry) in self.cache.iter() {
-            let entry_line_count = entry.lines.len();
-            let entry_end = current_line + entry_line_count;
-
-            // Check if this entry contains any of the selected lines
-            if current_line <= end.row && entry_end > start.row {
-                // Calculate which lines in this entry need highlighting
-                let start_row = start.row.saturating_sub(current_line);
-                let end_row = end
-                    .row
-                    .saturating_sub(current_line)
-                    .min(entry_line_count - 1);
-
-                for i in start_row..=end_row {
-                    if let Some(line) = entry.lines.get(i) {
-                        let mut line_content = Vec::new();
-                        let mut left_pipe_found: bool = false;
-                        let mut right_pipe_found: bool = false;
-                        for span in line.spans.iter() {
-                            if right_pipe_found {
-                                break;
-                            }
-
-                            if span.content.contains('│') {
-                                if left_pipe_found {
-                                    right_pipe_found = true;
-                                } else {
-                                    left_pipe_found = true;
-                                }
-                                continue;
-                            }
-                            if span.content.contains('╭')
-                                || span.content.contains('╮')
-                                || span.content.contains('╰')
-                                || span.content.contains('╯')
-                                || span.content.contains('─')
-                            {
-                                continue;
-                            }
-
-                            if left_pipe_found {
-                                line_content.push(String::from(span.content.clone()));
-                            }
-                        }
-                        match line_content.concat().trim_end() {
-                            "" => continue,
-                            v => selected_lines.push(v.to_string()),
-                        }
-                    }
-                }
-                return selected_lines.join("\n");
-            }
-            current_line = entry_end;
-        }
-        unreachable!("TODO");
     }
 }

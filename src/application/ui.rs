@@ -280,29 +280,26 @@ async fn start_loop<B: Backend>(
                     terminal,
                     &textarea,
                 ) {
-                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.reset_highlight();
                     app_state.bubble_list.highlight_selected_lines(&start, &end);
                 }
             }
             Event::Select(downclick_point, releaseclick_point) => {
-                if let Ok((start, end)) = validate_selected_region(
+                if let Ok((_start, _end)) = validate_selected_region(
                     &app_state,
                     downclick_point,
                     releaseclick_point,
                     terminal,
                     &textarea,
                 ) {
-                    app_state.bubble_list.clear_selection();
-                    app_state.bubble_list.highlight_selected_lines(&start, &end);
-                    let selected_text: String =
-                        app_state.bubble_list.yank_selected_lines(&start, &end);
+                    let selected_text: String = app_state.bubble_list.yank_selected_lines();
 
                     tx.send(Action::AcceptCodeBlock(
                         app_state.editor_context.clone(),
                         selected_text,
                         AcceptType::Replace,
                     ))?;
-                    app_state.bubble_list.clear_selection();
+                    app_state.bubble_list.reset_highlight();
                 }
             }
         }
