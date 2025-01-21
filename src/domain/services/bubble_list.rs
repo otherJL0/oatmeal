@@ -156,33 +156,35 @@ impl<'a> BubbleList<'a> {
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
                 line.spans.iter_mut().for_each(|span| {
-                    // if let Some(Color::DarkGray) = span.style.bg {
-                    //     tracing::debug!("highlight span: {:?}", span)
-                    // }
                     span.style = span.style.bg(Color::default());
                 })
             }
         }
     }
 
-    pub fn yank_selected_lines(&mut self) -> String {
-        let mut selected_lines: Vec<String> = Vec::new();
+    pub fn yank_selected_lines(&mut self, start: &Point, end: &Point) -> String {
+        let mut selected_lines: Vec<String> = Vec::with_capacity(end.row + 1 - start.row);
         for (_, entry) in self.cache.iter_mut() {
             for line in entry.lines.iter_mut() {
-                let mut current_line = Vec::new();
-                line.spans.iter_mut().for_each(|span| {
-                    if let Some(Color::DarkGray) = span.style.bg {
-                        tracing::debug!("highlight span: {:?}", span);
-                        current_line.push(String::from(span.content.clone()));
-                    }
-                });
+                let current_line: Vec<String> = line
+                    .spans
+                    .iter_mut()
+                    .filter_map(|span| {
+                        if let Some(Color::DarkGray) = span.style.bg {
+                            return Some(String::from(span.content.clone()));
+                        } else {
+                            return None;
+                        }
+                    })
+                    .collect();
                 if !current_line.is_empty() {
-                    tracing::debug!("{:?}", current_line);
                     selected_lines.push(current_line.join(""));
+                } else if !selected_lines.is_empty() {
+                    return selected_lines.join("\n");
                 }
             }
         }
-        return selected_lines.join("\n");
+        return String::new();
     }
 
     pub fn highlight_selected_lines(&mut self, start: &Point, end: &Point) {

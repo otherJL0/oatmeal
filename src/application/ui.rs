@@ -285,14 +285,15 @@ async fn start_loop<B: Backend>(
                 }
             }
             Event::Select(downclick_point, releaseclick_point) => {
-                if let Ok((_start, _end)) = validate_selected_region(
+                if let Ok((start, end)) = validate_selected_region(
                     &app_state,
                     downclick_point,
                     releaseclick_point,
                     terminal,
                     &textarea,
                 ) {
-                    let selected_text: String = app_state.bubble_list.yank_selected_lines();
+                    let selected_text: String =
+                        app_state.bubble_list.yank_selected_lines(&start, &end);
 
                     tx.send(Action::AcceptCodeBlock(
                         app_state.editor_context.clone(),
