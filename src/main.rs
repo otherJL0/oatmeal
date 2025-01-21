@@ -1,5 +1,6 @@
 #![deny(clippy::implicit_return)]
 #![allow(clippy::needless_return)]
+#![feature(let_chains)]
 
 mod application;
 mod configuration;

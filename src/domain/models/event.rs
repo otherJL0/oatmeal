@@ -5,7 +5,7 @@ use tui_textarea::Input;
 use super::BackendResponse;
 use super::Message;
 
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Copy, Default, Eq, PartialEq)]
 pub struct Point {
     pub column: usize,
     pub row: usize,

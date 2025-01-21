@@ -5,6 +5,7 @@ use ratatui::prelude::Rect;
 use ratatui::style::Color;
 use ratatui::text::Line;
 use syntect::highlighting::Theme;
+use unicode_width::UnicodeWidthStr;
 
 use super::Bubble;
 use super::BubbleAlignment;
@@ -29,10 +30,12 @@ pub struct BubbleList<'a> {
     pub theme: Theme,
 }
 
-fn highlight_start_row(line: &mut Line) {
+fn highlight_line(line: &mut Line, start_point: Option<Point>, end_point: Option<Point>) {
     let mut left_pipe_found: bool = false;
     let mut right_pipe_found: bool = false;
+    let mut current_column: usize = 0;
     for span in line.spans.iter_mut() {
+        current_column += span.content.width();
         if right_pipe_found {
             break;
         }
@@ -54,8 +57,13 @@ fn highlight_start_row(line: &mut Line) {
             continue;
         }
 
-        if left_pipe_found {
+        if left_pipe_found && current_column >= start_point.unwrap_or_default().column {
             span.style = span.style.bg(Color::DarkGray);
+        }
+        if let Some(end) = end_point
+            && current_column >= end.column
+        {
+            break;
         }
     }
 }
@@ -170,10 +178,16 @@ impl<'a> BubbleList<'a> {
                     .min(entry_line_count - 1);
 
                 // Update the style for the selected lines
-                for i in start_row..=end_row {
+                if let Some(line) = entry.lines.get_mut(start_row) {
+                    highlight_line(line, Some(*start), None);
+                }
+                for i in start_row + 1..end_row {
                     if let Some(line) = entry.lines.get_mut(i) {
-                        highlight_start_row(line);
+                        highlight_line(line, None, None);
                     }
+                }
+                if let Some(line) = entry.lines.get_mut(end_row) {
+                    highlight_line(line, None, Some(*end));
                 }
             }
             current_line = entry_end;
