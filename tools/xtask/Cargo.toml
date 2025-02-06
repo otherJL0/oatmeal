@@ -6,4 +6,4 @@ publish = false
 
 [dependencies]
 anyhow = "=1.0.95"
-toml_edit = "=0.22.22"
+toml_edit = "=0.22.23"
