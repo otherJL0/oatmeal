@@ -11,6 +11,7 @@ jobs:
           cargo update
           cargo upgrade
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.DEPENDENCY_TOKEN }}
@@ -33,7 +34,6 @@ jobs:
           GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
 
       - name: Enable Pull Request Automerge
-        run: gh pr merge --merge --auto "1"
+        run: gh pr merge --merge --auto "${{ steps.cpr.output.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
-
