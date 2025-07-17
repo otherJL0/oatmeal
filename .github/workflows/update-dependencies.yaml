@@ -24,6 +24,11 @@ jobs:
             [1]: https://github.com/peter-evans/create-pull-request
           branch: update-dependencies
 
+      - name: Mark PR as ready for review
+        run: gh pr ready update-dependencies
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
+
       - name: Enable Pull Request Automerge
         run: gh pr merge --merge --auto "1"
         env:
