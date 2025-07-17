@@ -24,6 +24,9 @@ jobs:
             [1]: https://github.com/peter-evans/create-pull-request
           branch: update-dependencies
 
+      - name: Sleep
+        run: sleep 20
+
       - name: Mark PR as ready for review
         run: gh pr ready update-dependencies
         env:
@@ -33,3 +36,4 @@ jobs:
         run: gh pr merge --merge --auto "1"
         env:
           GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
+
