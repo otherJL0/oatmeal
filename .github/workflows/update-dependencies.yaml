@@ -25,8 +25,11 @@ jobs:
             [1]: https://github.com/peter-evans/create-pull-request
           branch: update-dependencies
 
-      - name: Sleep
-        run: sleep 20
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
 
       - name: Mark PR as ready for review
         run: gh pr ready update-dependencies
@@ -34,6 +37,7 @@ jobs:
           GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
 
       - name: Enable Pull Request Automerge
-        run: gh pr merge --merge --auto "${{ steps.cpr.output.pull-request-number }}"
+        run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.DEPENDENCY_TOKEN }}
+
