@@ -22,3 +22,6 @@ jobs:
 
             [1]: https://github.com/peter-evans/create-pull-request
           branch: update-dependencies
+
+      - name: Enable Pull Request Automerge
+        run: gh pr merge --merge --auto "1"
